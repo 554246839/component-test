@@ -1,0 +1,115 @@
+.dynamic-table {
+  width: 100%;
+  min-height: 300px;
+
+  .operate-btn {
+    float: right;
+  }
+
+  .table-button {
+    padding-bottom: 10px;
+  }
+
+  .table-pagination {
+    padding: 10px;
+  }
+
+  .custom-text-btn {
+    white-space: pre-wrap;
+    height: auto;
+    text-align: left;
+    text-decoration: underline;
+  }
+}
+
+.custom-table {
+  display: flex;
+  flex: 1;
+  border-bottom: 1px solid #eee;
+
+  &.custom-header {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 22px;
+    background-color: #f6f6fa;
+  }
+
+  &.disabled {
+    background-color: #eee;
+  }
+
+  &:hover {
+    background-color: #f6f6fa;
+  }
+
+  .custom-column {
+    width: 25%;
+    padding: 10px 12px;
+    color: #2e2e38;
+
+    &.cell-center {
+      text-align: center;
+    }
+
+    &.move {
+      cursor: move;
+    }
+  }
+}
+
+.flip-list-move {
+  transition: transform 0.5s ease;
+}
+
+.dialog-footer {
+  text-align: center;
+}
+
+.dynamic-search {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 16px;
+
+  .search-btn {
+    text-align: right;
+    margin-bottom: 18px;
+  }
+
+  .el-select,
+  .el-input,
+  .el-date-editor {
+    width: 100%;
+  }
+}
+
+.dynamic-aside {
+  width: 200px;
+}
+
+.custom-dialog {
+
+  .el-select,
+  .el-input {
+    width: 100%;
+  }
+
+  .download-item {
+    color: #2e2e38;
+
+    &:hover {
+      text-decoration-line: underline;
+    }
+  }
+
+  .download-delete-icon {
+    vertical-align: middle;
+    margin-left: 10px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .form-item__tips {
+    color: #999;
+  }
+}

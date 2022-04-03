@@ -1,0 +1,406 @@
+{
+  "hide": true,
+  "type": "common",
+  "properties": {
+    "title": "文章管理",
+    "code": "articleManage",
+    "writeVariable": []
+  },
+  "dialogTemplate": [
+    {
+      "hide": true,
+      "type": "dialog",
+      "properties": {
+        "labelPosition": "right",
+        "title": "批量修改",
+        "width": "500px",
+        "showFooter": true,
+        "footerAlign": "center",
+        "writeVariable": []
+      },
+      "children": [
+        {
+          "type": "select",
+          "properties": {
+            "label": "状态",
+            "span": 24,
+            "status": "none",
+            "condition": "function fn(formData) {\n\n}",
+            "clearable": true,
+            "placeholder": "",
+            "optionsId": "publicStatus",
+            "prop": "status"
+          },
+          "id": "ae02c5d9-aba1-4591-810f-0ed2756bcf65"
+        }
+      ],
+      "buttons": [
+        {
+          "type": "button",
+          "properties": {
+            "label": "确认",
+            "type": "none",
+            "round": true,
+            "closeDialog": true,
+            "span": 24,
+            "showCondition": "function fn(row) {\n\n}",
+            "functionType": "other",
+            "styleType": "primary",
+            "refreshTable": true,
+            "api": "/update",
+            "requestType": "post"
+          },
+          "id": "88524072-c4d4-4287-8d66-a49df96ad845"
+        },
+        {
+          "type": "button",
+          "properties": {
+            "label": "取消",
+            "type": "none",
+            "round": true,
+            "closeDialog": true,
+            "span": 24,
+            "showCondition": "function fn(row) {\n\n}",
+            "functionType": "close"
+          },
+          "id": "c1281635-8229-43a3-9fb0-84e8817f5427"
+        }
+      ],
+      "id": "62542628-c860-4e27-9540-985b2b981c9e"
+    }
+  ],
+  "search": {
+    "bui": true,
+    "type": "search",
+    "properties": {
+      "labelPosition": "right",
+      "gutter": 20,
+      "searchBtnText": "搜索",
+      "searchIcon": "Search",
+      "resetBtnText": "重置",
+      "resetIcon": "Refresh"
+    },
+    "children": [
+      {
+        "type": "input",
+        "properties": {
+          "label": "名称",
+          "span": "6",
+          "status": "none",
+          "condition": "function fn(formData) {\n\n}",
+          "type": "text",
+          "clearable": true,
+          "prop": "name"
+        },
+        "id": "ad7d012e-3ca6-4859-a2b1-fb289ac9e574"
+      },
+      {
+        "type": "date",
+        "properties": {
+          "label": "发布日期",
+          "span": "6",
+          "status": "none",
+          "condition": "function fn(formData) {\n\n}",
+          "type": "daterange",
+          "format": "YYYY-MM-DD",
+          "valueFormat": "YYYY-MM-DD",
+          "clearable": true,
+          "prop": "publicDate"
+        },
+        "id": "3c66d0dd-f944-4154-8fec-06fd6c75d443"
+      },
+      {
+        "type": "select",
+        "properties": {
+          "label": "文章状态",
+          "span": "6",
+          "status": "none",
+          "condition": "function fn(formData) {\n\n}",
+          "clearable": true,
+          "optionsId": "articleStatus",
+          "prop": "status"
+        },
+        "id": "7524ef65-1379-43fa-aad6-17a6b0dfa774"
+      }
+    ],
+    "id": "23be9533-18d9-4769-861b-d78aa513837c"
+  },
+  "table": {
+    "bui": true,
+    "type": "table",
+    "properties": {
+      "size": "small",
+      "api": "/getData",
+      "requestType": "post",
+      "sumCols": [
+        "readNum",
+        "likeNum",
+        "commentNum"
+      ],
+      "pagination": true,
+      "pSize": 10,
+      "pSizes": "10,20,50,100",
+      "pAlign": "right",
+      "showSum": true,
+      "sumText": "合计"
+    },
+    "buttons": [
+      {
+        "type": "button",
+        "properties": {
+          "label": "新增",
+          "type": "link",
+          "round": true,
+          "closeDialog": true,
+          "span": 24,
+          "showCondition": "function fn(row) {\n\n}",
+          "functionType": "other",
+          "styleType": "primary",
+          "externalLink": true,
+          "url": "https://juejin.cn/post/7073131582176886815"
+        },
+        "id": "e2a2c1c3-d1fc-4970-b3b7-012a994e76ba"
+      },
+      {
+        "type": "button",
+        "properties": {
+          "label": "批量删除",
+          "type": "confirm",
+          "round": true,
+          "closeDialog": true,
+          "span": 24,
+          "showCondition": "function fn(row) {\n\n}",
+          "functionType": "other",
+          "depData": "table",
+          "title": "提示",
+          "message": "确认删除已选数据！",
+          "api": "/delete/article",
+          "requestType": "post",
+          "refreshTable": true,
+          "requestParams": "pageId={pageId}"
+        },
+        "id": "6ecf31f0-bed4-4bb9-bc2e-c0e067fb13ff"
+      },
+      {
+        "type": "button",
+        "properties": {
+          "label": "状态修改",
+          "type": "dialog",
+          "round": true,
+          "closeDialog": true,
+          "span": 24,
+          "showCondition": "function fn(row) {\n\n}",
+          "functionType": "other",
+          "depData": "table",
+          "dialogTemplateId": "62542628-c860-4e27-9540-985b2b981c9e"
+        },
+        "id": "45ad1185-a3c8-4387-a1f1-5cec1a459b07"
+      }
+    ],
+    "children": [
+      {
+        "type": "column",
+        "properties": {
+          "label": "label",
+          "align": "center",
+          "type": "selection",
+          "fixed": "none",
+          "customText": "function fn(row, parse) {\n\n}",
+          "width": "60"
+        },
+        "id": "eebde84c-1ea8-4506-ba10-d6662b15ffc1"
+      },
+      {
+        "type": "column",
+        "properties": {
+          "label": "文章标题",
+          "align": "left",
+          "type": "operate",
+          "fixed": "none",
+          "customText": "function fn(row, parse) {\n  return {\n    text: row.name,\n    style: {\n      color: 'red'\n    }\n  }\n}",
+          "prop": "name",
+          "isCustomText": true
+        },
+        "id": "5b2d937c-fbff-458f-af5e-c6e98640f8c2",
+        "children": [
+          {
+            "type": "button",
+            "properties": {
+              "label": "文本",
+              "type": "link",
+              "round": true,
+              "closeDialog": true,
+              "span": 24,
+              "showCondition": "function fn(row) {\n\n}",
+              "functionType": "other",
+              "styleType": "text",
+              "url": "https://juejin.cn/post/7073131582176886815",
+              "externalLink": true
+            },
+            "id": "8e0d0b26-9bf5-45fc-bc83-5289129acad6"
+          }
+        ]
+      },
+      {
+        "type": "column",
+        "properties": {
+          "label": "状态",
+          "align": "left",
+          "type": "default",
+          "fixed": "none",
+          "customText": "function fn(row, parse) {\n  return parse(row.status, 'status')\n}",
+          "isCustomText": true,
+          "parentData": "articleStatus",
+          "prop": "status"
+        },
+        "id": "f9b62116-ccef-42ed-be60-3f858b5e6d6a"
+      },
+      {
+        "type": "column",
+        "properties": {
+          "label": "发布日期",
+          "align": "left",
+          "type": "default",
+          "fixed": "none",
+          "customText": "function fn(row, parse) {\n\n}",
+          "format": "date",
+          "prop": "publicDate"
+        },
+        "id": "20860ee8-3ae7-43e0-97aa-f30751060e47"
+      },
+      {
+        "type": "column",
+        "properties": {
+          "label": "阅读数",
+          "align": "left",
+          "type": "default",
+          "fixed": "none",
+          "customText": "function fn(row, parse) {\n\n}",
+          "prop": "readNum",
+          "format": "thousandth"
+        },
+        "id": "9d76b0c2-170f-4d44-91b1-93526e75a370"
+      },
+      {
+        "type": "column",
+        "properties": {
+          "label": "点赞数",
+          "align": "left",
+          "type": "default",
+          "fixed": "none",
+          "customText": "function fn(row, parse) {\n\n}",
+          "prop": "likeNum"
+        },
+        "id": "179233aa-6c5e-4887-9f8d-44b44515e440"
+      },
+      {
+        "type": "column",
+        "properties": {
+          "label": "评论数",
+          "align": "left",
+          "type": "default",
+          "fixed": "none",
+          "customText": "function fn(row, parse) {\n\n}",
+          "prop": "commentNum"
+        },
+        "id": "1b8f11a0-ce85-4487-ba84-29eb0cc0cd9d"
+      },
+      {
+        "type": "column",
+        "properties": {
+          "label": "操作",
+          "align": "left",
+          "type": "operate",
+          "fixed": "none",
+          "customText": "function fn(row, parse) {\n\n}",
+          "width": "250"
+        },
+        "id": "83f911ae-b81c-470a-8089-1b63cc3e899c",
+        "children": [
+          {
+            "type": "button",
+            "properties": {
+              "label": "编辑",
+              "type": "link",
+              "round": true,
+              "closeDialog": true,
+              "span": 24,
+              "showCondition": "function fn(row) {\n\n}",
+              "functionType": "other",
+              "styleType": "text",
+              "externalLink": true,
+              "url": "https://juejin.cn/post/7073131582176886815",
+              "btnSize": "small"
+            },
+            "id": "22535627-a2ab-425d-8234-fcb731a0bfcf"
+          },
+          {
+            "type": "button",
+            "properties": {
+              "label": "发布",
+              "type": "confirm",
+              "round": true,
+              "closeDialog": true,
+              "span": 24,
+              "showCondition": "function fn(row) {\n  return row.status === '0'\n}",
+              "functionType": "other",
+              "btnSize": "small",
+              "styleType": "text",
+              "refreshTable": true,
+              "title": "确认发布",
+              "message": "确认发布该文章",
+              "api": "/update",
+              "requestType": "post",
+              "requestParams": "status=1"
+            },
+            "id": "0fe7d430-4e08-4fde-bc98-fc92a3409fc7"
+          },
+          {
+            "type": "button",
+            "properties": {
+              "label": "取消发布",
+              "type": "confirm",
+              "round": true,
+              "closeDialog": true,
+              "span": 24,
+              "showCondition": "function fn(row) {\n  return row.status === '1'\n}",
+              "functionType": "other",
+              "styleType": "text",
+              "btnSize": "small",
+              "title": "取消发布",
+              "message": "确认取消发布",
+              "api": "/update",
+              "requestType": "post",
+              "requestParams": "status=0",
+              "refreshTable": true
+            },
+            "id": "02108fd4-08b7-4ffd-a193-77d9d8383c7b"
+          },
+          {
+            "type": "button",
+            "properties": {
+              "label": "删除",
+              "type": "confirm",
+              "round": true,
+              "closeDialog": true,
+              "span": 24,
+              "showCondition": "function fn(row) {\n\n}",
+              "functionType": "other",
+              "styleType": "text",
+              "title": "提示",
+              "message": "确认删除该数据！",
+              "btnSize": "small",
+              "api": "/delete/article",
+              "requestType": "post",
+              "refreshTable": true,
+              "requestParams": "pageId={pageId}"
+            },
+            "id": "efb8157e-4b8d-4c68-8de7-961c95feac41"
+          }
+        ]
+      }
+    ],
+    "sortables": [],
+    "id": "6698b60c-d3de-49e3-9238-e802423fd11d"
+  }
+}

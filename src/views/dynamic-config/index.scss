@@ -1,0 +1,454 @@
+.dynamic-config {
+  .dynamic-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+
+    .title-btn {
+      float: right;
+    }
+  }
+
+  .contanier {
+    display: flex;
+    height: calc(100vh - 71px);
+    border: 1px solid #eee;
+    overflow: hidden;
+    padding: 0 300px 0 270px;
+    position: relative;
+
+    h3 {
+      padding: 20px 0;
+      font-size: 16px;
+    }
+
+    h4 {
+      margin: 10px 0;
+      font-size: 14px;
+    }
+
+    h5 {
+      margin-bottom: 5px;
+    }
+
+    .dynamic-left {
+      width: 270px;
+      padding: 20px;
+      background-color: #eee;
+      box-sizing: border-box;
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .dynamic-middle {
+      position: relative;
+      width: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+      height: 100%;
+
+      // overflow: hidden;
+      .dynamic-dialog {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        .dialog-mask {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .dialog-main {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          overflow-y: auto;
+          padding: 40px;
+
+          .dialog-header {
+            padding: 20px;
+            padding-bottom: 10px;
+          }
+
+          .dialog-body {
+            padding: 25px 25px 30px;
+            border: 1px solid #eee;
+            border-left: none;
+            border-right: none;
+
+            .form-item-tip {
+              color: #999;
+              font-size: 12px;
+              line-height: 16px;
+            }
+          }
+
+          .dialog-footer {
+            padding: 10px 20px 20px;
+          }
+        }
+
+        .dialog-container {
+          width: 500px;
+          border-radius: 2px;
+          background-color: #fff;
+          margin: 40px auto;
+          position: relative;
+
+          .close-dialog {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+
+            &:hover {
+              color: #409eff;
+            }
+          }
+        }
+      }
+    }
+
+    .dynamic-right {
+      width: 300px;
+      padding: 20px;
+      background-color: #eee;
+      box-sizing: border-box;
+      overflow-y: auto;
+      height: 100%;
+      position: absolute;
+      right: 0;
+      top: 0;
+
+      .dynamic-properties {
+        min-height: 100%;
+        padding: 0 10px 10px 20px;
+        border: 1px solid #bbb;
+        box-sizing: border-box;
+      }
+
+      .property-children {
+        position: relative;
+        padding: 2px 0;
+
+        .delete-child {
+          position: absolute;
+          top: 0;
+          right: 0;
+          cursor: pointer;
+          display: none;
+
+          &:hover {
+            color: #f56c6c;
+          }
+        }
+
+        &:hover {
+          box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.1);
+
+          .delete-child {
+            display: block;
+          }
+        }
+      }
+
+      .code-editor {
+        width: 100%;
+        background-color: #fff;
+        border: 1px soled #dcdfe6;
+        border-radius: 5px;
+        cursor: pointer;
+        line-height: 20px;
+        padding: 10px;
+      }
+    }
+
+    .dynamic-components {
+      height: 100%;
+      border: 1px solid #bbb;
+      padding: 65px 10px 10px 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+
+      .left-tab {
+        display: flex;
+        position: absolute;
+        left: 21px;
+        top: 21px;
+        right: 38px;
+        background-color: #eee;
+        z-index: 1000;
+
+        h3 {
+          flex: 1;
+          text-align: center;
+          cursor: pointer;
+
+          &.active,
+          &:hover {
+            color: #409eff;
+          }
+        }
+      }
+
+      .component-list {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+      }
+
+      .component {
+        width: 45%;
+        background: #fff;
+        margin: 0 10px 10px 0;
+        padding: 5px 10px;
+        font-size: 14px;
+        cursor: move;
+        border: 1px solid #ddd;
+
+        &:nth-child(2n) {
+          margin-right: 0;
+        }
+      }
+
+      .createTemplate {
+        font-weight: bold;
+        margin-left: 10px;
+        cursor: pointer;
+      }
+
+      .dialog-template-list {
+        .dialog-template {
+          cursor: pointer;
+          color: #333;
+          font-size: 14px;
+
+          &:hover,
+          &.active-dialog {
+            color: #409eff;
+          }
+        }
+
+        .handle-dialog {
+          margin-left: 10px;
+          vertical-align: middle;
+          cursor: pointer;
+          display: none;
+
+          &:hover {
+            color: #409eff;
+          }
+        }
+
+        .dialog-template-item {
+          padding: 5px 0;
+
+          &:hover .handle-dialog {
+            display: inline-block;
+          }
+        }
+      }
+
+      .component-title {
+        cursor: pointer;
+        position: relative;
+
+        h4 {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          padding-right: 20px;
+          font-size: 14px;
+        }
+
+        .spread-icon {
+          position: absolute;
+          right: 0;
+          top: 2px;
+        }
+      }
+
+      .left-component-item {
+        padding: 5px;
+        cursor: move;
+        font-size: 13px;
+
+        &:hover {
+          box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .position {
+          cursor: pointer;
+          float: right;
+        }
+
+        .component-tips {
+          color: #999;
+          font-size: 12px;
+          margin-top: 5px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+
+    .dynamic-mian {
+      height: 100%;
+      padding: 10px;
+      border: 1px solid #eee;
+      box-sizing: border-box;
+      position: relative;
+      overflow-y: auto;
+
+      .page-title {
+        padding: 20px;
+      }
+
+      .page-search {
+        padding: 10px;
+        border: 1px solid #eee;
+        margin-bottom: 10px;
+      }
+
+      .page-main {
+        position: relative;
+      }
+
+      .page-aside {
+        min-height: 80px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        border: 1px solid #eee;
+        padding: 10px;
+        box-sizing: border-box;
+
+        .aside-text {
+          font-size: 14px;
+          margin-right: 10px;
+        }
+      }
+
+      .page-table {
+        width: 100%;
+        border: 1px solid #eee;
+      }
+    }
+
+    .table-buttons {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .table-container {
+      min-height: 122px;
+      line-height: 24px;
+      overflow-x: auto;
+      border-bottom: 1px solid #eee;
+      box-sizing: border-box;
+      white-space: nowrap;
+
+      .table-column {
+        border: 1px solid transparent;
+        border-right: 1px solid #eee;
+        display: inline-block;
+        vertical-align: text-bottom;
+
+        .column-header {
+          height: 40px;
+          line-height: 40px;
+          font-weight: bold;
+          border-bottom: 1px solid #eee;
+          padding: 5px;
+        }
+
+        .column-prop {
+          border-bottom: 1px solid #eee;
+        }
+
+        .column-cell,
+        .column-prop {
+          height: 40px;
+          line-height: 40px;
+          font-size: 14px;
+          padding: 5px;
+          overflow: hidden;
+        }
+      }
+    }
+
+    .table-pagination {
+      padding: 10px;
+    }
+
+    .delete-component {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-size: 12px;
+      cursor: pointer;
+      display: none;
+      color: #fff;
+      border-radius: 50%;
+      padding: 2px;
+      background-color: #f56c6c;
+      z-index: 10;
+      width: 15px;
+      height: 15px;
+    }
+
+    .table-column .delete-component {
+      top: 0;
+      right: 0;
+    }
+
+    .dp-active {
+      position: relative;
+      border: 1px solid #409eff !important;
+      box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.1);
+
+      >.delete-component,
+      >*>.delete-component {
+        display: block;
+      }
+    }
+
+    .custom-add {
+      display: flex;
+      padding-right: 10px !important;
+
+      >span {
+        display: block;
+        width: 100px;
+      }
+    }
+
+    .el-upload,
+    .el-upload-dragger {
+      max-width: 100%;
+    }
+
+    .el-input,
+    .el-date-editor {
+      width: 100%;
+    }
+
+    .flip-list-move {
+      transition: transform 0.5s ease;
+    }
+  }
+}
