@@ -4,7 +4,7 @@
  * Author: Kang Dong
  */
 
-import { ComponentType, Attr } from './component-list'
+import { ComponentType, Attr } from './type'
 
 export default function changeComponentSize(
   e: MouseEvent,
@@ -12,7 +12,9 @@ export default function changeComponentSize(
   direction: 'lu' | 'ru' | 'rd' | 'ld',
   pagex: number,
   pagey: number,
-  cacheAttr: Attr
+  cacheAttr: Attr,
+  areaPoint: Attr | undefined = undefined,
+  areaPointCacheAttr?: Attr
 ) {
   if (!component) {
     return
@@ -22,6 +24,10 @@ export default function changeComponentSize(
   if (direction === 'rd') {
     component.attr.w = Math.max(0, cacheAttr.w + e.pageX - pagex)
     component.attr.h = Math.max(0, cacheAttr.h + e.pageY - pagey)
+    if (areaPoint && areaPointCacheAttr) { // 范围选择操作
+      areaPoint.w = Math.max(0, areaPointCacheAttr.w + e.pageX - pagex)
+      areaPoint.h = Math.max(0, areaPointCacheAttr.h + e.pageY - pagey)
+    }
   }
 
   // 右上角改变宽、高、top
@@ -29,6 +35,11 @@ export default function changeComponentSize(
     component.attr.w = Math.max(0, cacheAttr.w + e.pageX - pagex)
     component.attr.h = Math.max(0, cacheAttr.h + pagey - e.pageY)
     component.attr.y = Math.min(cacheAttr.y + cacheAttr.h, cacheAttr.y + e.pageY - pagey)
+    if (areaPoint && areaPointCacheAttr) { // 范围选择操作
+      areaPoint.w = Math.max(0, areaPointCacheAttr.w + e.pageX - pagex)
+      areaPoint.h = Math.max(0, areaPointCacheAttr.h + pagey - e.pageY)
+      areaPoint.y = Math.min(areaPointCacheAttr.y + areaPointCacheAttr.h, areaPointCacheAttr.y + e.pageY - pagey)
+    }
   }
 
   // 左下角改变宽、高、left
@@ -36,6 +47,11 @@ export default function changeComponentSize(
     component.attr.w = Math.max(0, cacheAttr.w + pagex - e.pageX)
     component.attr.h = Math.max(0, cacheAttr.h + e.pageY - pagey)
     component.attr.x = Math.min(cacheAttr.x + cacheAttr.w, cacheAttr.x + e.pageX - pagex)
+    if (areaPoint && areaPointCacheAttr) { // 范围选择操作
+      areaPoint.w = Math.max(0, areaPointCacheAttr.w + pagex - e.pageX)
+      areaPoint.h = Math.max(0, areaPointCacheAttr.h + e.pageY - pagey)
+      areaPoint.x = Math.min(areaPointCacheAttr.x + areaPointCacheAttr.w, areaPointCacheAttr.x + e.pageX - pagex)
+    }
   }
 
   // 左上角改变宽、高、left、top
@@ -44,6 +60,12 @@ export default function changeComponentSize(
     component.attr.h = Math.max(0, cacheAttr.h + pagey - e.pageY)
     component.attr.x = Math.min(cacheAttr.x + cacheAttr.w, cacheAttr.x + e.pageX - pagex)
     component.attr.y = Math.min(cacheAttr.y + cacheAttr.h, cacheAttr.y + e.pageY - pagey)
+    if (areaPoint && areaPointCacheAttr) { // 范围选择操作
+      areaPoint.w = Math.max(0, areaPointCacheAttr.w + pagex - e.pageX)
+      areaPoint.h = Math.max(0, areaPointCacheAttr.h + pagey - e.pageY)
+      areaPoint.x = Math.min(areaPointCacheAttr.x + areaPointCacheAttr.w, areaPointCacheAttr.x + e.pageX - pagex)
+      areaPoint.y = Math.min(areaPointCacheAttr.y + areaPointCacheAttr.h, areaPointCacheAttr.y + e.pageY - pagey)
+    }
   }
 }
 

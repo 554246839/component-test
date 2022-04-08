@@ -67,6 +67,71 @@
         }
       ],
       "id": "62542628-c860-4e27-9540-985b2b981c9e"
+    },
+    {
+      "hide": true,
+      "type": "dialog",
+      "properties": {
+        "labelPosition": "right",
+        "title": "弹窗模板",
+        "width": "500px",
+        "showFooter": true,
+        "footerAlign": "left",
+        "writeVariable": []
+      },
+      "children": [
+        {
+          "type": "text",
+          "properties": {
+            "label": "阅读数",
+            "text": "文本",
+            "span": 24,
+            "condition": "function fn(formData) {\n\n}",
+            "customText": "function fn(formData, parse) {\n\n}",
+            "prop": "readNum"
+          },
+          "id": "6aa6a7a9-5ed0-4781-8ffc-1b3a515f2edb"
+        },
+        {
+          "type": "text",
+          "properties": {
+            "label": "点赞数",
+            "text": "文本",
+            "span": 24,
+            "condition": "function fn(formData) {\n\n}",
+            "customText": "function fn(formData, parse) {\n\n}",
+            "prop": "likeNum"
+          },
+          "id": "844c9605-507f-4fb2-ae93-ece4b1b3829d"
+        },
+        {
+          "type": "text",
+          "properties": {
+            "label": "评论数",
+            "text": "文本",
+            "span": 24,
+            "condition": "function fn(formData) {\n\n}",
+            "customText": "function fn(formData, parse) {\n\n}",
+            "prop": "commentNum"
+          },
+          "id": "76f35389-5914-4fce-b84e-ec38244b6e95"
+        },
+        {
+          "type": "text",
+          "properties": {
+            "label": "合计",
+            "text": "文本",
+            "span": 24,
+            "condition": "function fn(formData) {\n\n}",
+            "customText": "function fn(formData, parse) {\n  return `阅读数 + 点赞数 + 评论数 = ${formData.readNum + formData.likeNum + formData.commentNum}`\n}",
+            "isCustom": true,
+            "parentData": []
+          },
+          "id": "ab686581-709b-44e4-94e7-709c54031600"
+        }
+      ],
+      "buttons": [],
+      "id": "3fc071e8-e043-49ad-9ba3-f16e77be2de4"
     }
   ],
   "search": {
@@ -313,10 +378,26 @@
           "type": "operate",
           "fixed": "none",
           "customText": "function fn(row, parse) {\n\n}",
-          "width": "250"
+          "width": "350"
         },
         "id": "83f911ae-b81c-470a-8089-1b63cc3e899c",
         "children": [
+          {
+            "type": "button",
+            "properties": {
+              "label": "查看",
+              "type": "dialog",
+              "round": true,
+              "closeDialog": true,
+              "span": 24,
+              "showCondition": "function fn(row) {\n\n}",
+              "functionType": "other",
+              "styleType": "text",
+              "btnSize": "small",
+              "dialogTemplateId": "3fc071e8-e043-49ad-9ba3-f16e77be2de4"
+            },
+            "id": "7a754f66-e04c-46f6-a5f5-11ffe9d509cb"
+          },
           {
             "type": "button",
             "properties": {

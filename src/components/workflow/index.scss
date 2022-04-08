@@ -16,7 +16,7 @@ body {
 
 .workflow-main {
   position: relative;
-  height: calc(100vh - 45px);
+  height: calc(100vh - 65px);
   box-sizing: border-box;
 
   .workflow-left {
@@ -110,6 +110,8 @@ body {
       background-color: #fff;
       align-items: center;
       cursor: move;
+      font-size: 12px;
+      padding: 5px;
     }
   }
 
@@ -120,7 +122,7 @@ body {
   }
 
   .shape-control {
-    border-color: #59c7f9;
+    border: 1px dashed #59c7f9;
     cursor: move;
   }
 
@@ -174,8 +176,60 @@ body {
     }
   }
 
+  .text-content {
+    position: absolute;
+    inset: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+    border: 1px solid #59c7f9;
+    cursor: text;
+    font-size: 12px;
+  }
+
   .area-contaier {
     position: absolute;
     border: 1px solid #59c7f9;
+  }
+
+  .line-extrainfo {
+    position: absolute;
+    padding: 0 5px;
+    text-align: center;
+    background-color: #fff;
+    outline: none;
+    font-size: 11px;
+    line-height: 16px;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    user-select: none;
+
+    &.editing {
+      box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+      cursor: text;
+      border: 1px solid #59c7f9;
+      user-select: text;
+      min-width: 50px;
+    }
+  }
+
+  .adsorb-line {
+    position: absolute;
+    width: 0;
+    height: 0;
+    z-index: 9999;
+
+    &.coord-x {
+      width: 100%;
+      left: 0;
+      border-top: 1px dashed #59c7f9;
+    }
+
+    &.coord-y {
+      height: 100%;
+      top: 0;
+      border-left: 1px dashed #59c7f9;
+    }
   }
 }

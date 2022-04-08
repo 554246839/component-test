@@ -4,7 +4,8 @@
  * Author: Kang Dong
  */
 
-import componentList, { ComponentType } from './component-list'
+import componentList from './component-list'
+import { ComponentType } from './type'
 import { getUUID } from './utils'
 
 export const dragstart = (e: DragEvent, index: number) => {

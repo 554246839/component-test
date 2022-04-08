@@ -4,42 +4,7 @@
  * Author: Kang Dong
  */
 
-export interface Attr {
-  x: number
-  y: number
-  w: number
-  h: number
-}
-
-export type Direction = 'up' | 'down' | 'left' | 'right'
-
-export interface Next {
-  id: string
-  directionStart: Direction
-  directionEnd: Direction
-}
-
-export interface ComponentType {
-  id: string
-  name: string
-  attr: Attr
-  label: string
-  props: {
-    next: Next[]
-  }
-}
-
-export interface CanvasLineType {
-  id: string
-  startx: number
-  starty: number
-  endx: number
-  endy: number
-  w: number
-  h: number
-  left: number
-  top: number
-}
+import { ComponentType } from './type'
 
 const componentList: ComponentType[] = [
   {
