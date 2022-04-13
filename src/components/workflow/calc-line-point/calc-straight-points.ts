@@ -3,14 +3,14 @@
  * Created Date: 2022-04-07 22:32:40
  * Author: Kang Dong
  */
-import { Quadrant, CalcType } from '../type'
+import WF from '../type'
 
 const firstDistance = 30
 
 // 折线坐标计算，总共 4 * 4 * 4 = 64 种连接方式
-export default function calcStraightPoints({ startDire, startx, starty, destDire, destx, desty, w, h, dw, dh }: CalcType,
-  points: number[][],
-  quadrant: Quadrant) {
+export default function calcStraightPoints({ startDire, startx, starty, destDire, destx, desty, w, h, dw, dh }: WF.CalcType,
+  points: [number, number][],
+  quadrant: WF.Quadrant) {
   switch (startDire) {
     case 'down':
       switch (quadrant) {
@@ -358,8 +358,8 @@ export default function calcStraightPoints({ startDire, startx, starty, destDire
               {
                 const initDisRU = Math.min(firstDistance, (starty - desty) / 2)
                 points.push([startx, starty - initDisRU])
-                points.push([startx, Math.min(starty - initDisRU, desty + initDisRU)])
-                points.push([destx, Math.min(starty - initDisRU, desty + initDisRU)])
+                points.push([startx, starty - (starty - desty) / 2])
+                points.push([destx, starty - (starty - desty) / 2])
                 points.push([destx, desty + initDisRU])
               }
               break
@@ -400,10 +400,10 @@ export default function calcStraightPoints({ startDire, startx, starty, destDire
           switch (destDire) {
             case 'down':
               {
-                let initDisLU = Math.min(firstDistance, (starty - desty) / 2)
+                const initDisLU = Math.min(firstDistance, (starty - desty) / 2)
                 points.push([startx, starty - initDisLU])
-                points.push([startx, Math.min(starty - initDisLU, desty + initDisLU)])
-                points.push([destx, Math.min(starty - initDisLU, desty + initDisLU)])
+                points.push([startx, starty - (starty - desty) / 2])
+                points.push([destx, starty - (starty - desty) / 2])
                 points.push([destx, desty + initDisLU])
               }
               break
@@ -445,8 +445,8 @@ export default function calcStraightPoints({ startDire, startx, starty, destDire
           switch (destDire) {
             case 'down':
               {
-                let initDisLD = startx - dw / 2 - w / 2 - destx
-                let threedx = Math.min(startx - w / 2 - initDisLD / 2, destx + dw / 2 + firstDistance) // 第四象限的第三点的x
+                const initDisLD = startx - dw / 2 - w / 2 - destx
+                let threedx = startx - w / 2 - initDisLD / 2 // 第四象限的第三点的x
                 if (initDisLD < 10) { // 从组件左边连线
                   threedx = Math.min(startx - w / 2 - firstDistance, destx - dw / 2 - firstDistance)
                 }
@@ -470,7 +470,7 @@ export default function calcStraightPoints({ startDire, startx, starty, destDire
               break
             case 'right':
               {
-                let initDisLD = startx - w / 2 - destx
+                const initDisLD = startx - w / 2 - destx
                 let threex = Math.min(destx + firstDistance, startx - w / 2 - initDisLD / 2) // 第三象限的第三点的x
                 if (initDisLD < 10) { // 从组件右边连线
                   threex = Math.max(destx + firstDistance, startx + w / 2 + firstDistance)
@@ -490,8 +490,8 @@ export default function calcStraightPoints({ startDire, startx, starty, destDire
           switch (destDire) {
             case 'down':
               {
-                let initDisRD = destx - dw / 2 - w / 2 - startx
-                let threedx = Math.max(startx + w / 2 + initDisRD / 2, destx - dw / 2 - firstDistance) // 第四象限的第三点的x
+                const initDisRD = destx - dw / 2 - w / 2 - startx
+                let threedx = startx + w / 2 + initDisRD / 2 // 第四象限的第三点的x
                 if (initDisRD < 10) { // 从组件右边连线
                   threedx = Math.max(startx + w / 2 + firstDistance, destx + dw / 2 + firstDistance)
                 }
@@ -510,7 +510,7 @@ export default function calcStraightPoints({ startDire, startx, starty, destDire
               break
             case 'left':
               {
-                let initDisRD = destx - w / 2 - startx
+                const initDisRD = destx - w / 2 - startx
                 let threex = Math.max(startx + w / 2 + initDisRD / 2, destx - firstDistance) // 第四象限的第三点的x
                 if (initDisRD < 5) { // 从组件左边连线
                   threex = Math.min(startx - w / 2 - firstDistance, destx - firstDistance)

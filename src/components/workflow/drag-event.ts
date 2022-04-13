@@ -4,8 +4,7 @@
  * Author: Kang Dong
  */
 
-import componentList from './component-list'
-import { ComponentType } from './type'
+import WF from './type'
 import { getUUID } from './utils'
 
 export const dragstart = (e: DragEvent, index: number) => {
@@ -16,14 +15,14 @@ export const dragover = (e: DragEvent) => {
   e.preventDefault()
 }
 
-export const drop = (e: DragEvent, componentRenderList: ComponentType[]) => {
+export const drop = (e: DragEvent, componentList: WF.ComponentType[], componentRenderList: WF.ComponentType[]) => {
   const index = +(e.dataTransfer?.getData('index') || 0)
 
   if ((e.target as HTMLElement).dataset.type !== 'container') {
     return
   }
 
-  const activeComponent: ComponentType = JSON.parse(JSON.stringify(componentList[index]))
+  const activeComponent: WF.ComponentType = JSON.parse(JSON.stringify(componentList[index]))
   activeComponent.attr.x = e.offsetX
   activeComponent.attr.y = e.offsetY
   activeComponent.id = getUUID()

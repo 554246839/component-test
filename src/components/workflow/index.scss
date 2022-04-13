@@ -12,6 +12,10 @@ body {
   box-sizing: border-box;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
   background-color: #fff;
+
+  * {
+    box-sizing: border-box;
+  }
 }
 
 .workflow-main {
@@ -19,15 +23,17 @@ body {
   height: calc(100vh - 65px);
   box-sizing: border-box;
 
+  * {
+    box-sizing: border-box;
+  }
+
   .workflow-left {
     position: absolute;
     top: 0;
     left: 0;
     width: 200px;
     height: 100%;
-    padding: 10px;
     z-index: 1;
-    box-sizing: border-box;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
   }
 
@@ -35,8 +41,7 @@ body {
     position: relative;
     height: 100%;
     padding: 10px;
-    margin: 0 400px 0 200px;
-    box-sizing: border-box;
+    margin: 0 300px 0 200px;
     overflow: hidden;
     background-color: #eee;
 
@@ -46,7 +51,6 @@ body {
       height: calc(100% + 500px);
       padding: 40px;
       background-color: #ccc;
-      box-sizing: border-box;
     }
 
     #mask-canvas {
@@ -56,7 +60,6 @@ body {
 
     .workflow-container {
       position: absolute;
-      box-sizing: border-box;
     }
   }
 
@@ -71,28 +74,36 @@ body {
   .workflow-right {
     position: absolute;
     top: 0;
-    padding: 10px;
     right: 0;
-    width: 400px;
+    width: 300px;
     height: 100%;
     z-index: 1;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
-    box-sizing: border-box;
   }
 
   .component-item {
-    padding: 4px 8px;
-    border: 1px solid #aaa;
+    padding: 12px 8px;
     cursor: move;
-    background-color: #eee;
+    background-color: #fff;
     margin-bottom: 10px;
+    border-radius: 2px;
+    color: #2e2e38;
+    font-size: 16px;
+
+    &:hover {
+      background-color: rgba(24, 144, 255, 0.1);
+    }
+  }
+
+  .left-list-icon {
+    margin-right: 10px;
+    vertical-align: top;
   }
 
   .render-component {
     position: absolute;
     text-align: center;
     user-select: none;
-    // padding: 10px;
 
     &.active,
     &:hover {
@@ -101,18 +112,6 @@ body {
       }
     }
 
-    .component-container {
-      border: 1px solid #333;
-      position: absolute;
-      inset: 0;
-      display: flex;
-      justify-content: center;
-      background-color: #fff;
-      align-items: center;
-      cursor: move;
-      font-size: 12px;
-      padding: 5px;
-    }
   }
 
   .shape-control {
@@ -140,7 +139,6 @@ body {
     z-index: 1;
     margin-left: -4px;
     margin-top: -4px;
-    box-sizing: border-box;
 
     &.up,
     &.right,
@@ -191,6 +189,8 @@ body {
   .area-contaier {
     position: absolute;
     border: 1px solid #59c7f9;
+    background-color: rgba(89, 199, 249, 0.1);
+    z-index: 9999;
   }
 
   .line-extrainfo {
@@ -232,4 +232,28 @@ body {
       border-left: 1px dashed #59c7f9;
     }
   }
+
+  .component-attr-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .el-select {
+    width: 100%;
+  }
+}
+
+.component-container {
+  border: 2px solid #1890FF;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  background-color: #fff;
+  align-items: center;
+  cursor: move;
+  font-size: 14px;
+  padding: 5px;
+  border-radius: 5px;
 }

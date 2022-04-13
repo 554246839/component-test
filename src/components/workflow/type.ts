@@ -4,77 +4,107 @@
  * Author: Kang Dong
  */
 
-export interface Attr {
-  x: number
-  y: number
-  w: number
-  h: number
-}
+namespace WF {
 
-export type Direction = 'up' | 'down' | 'left' | 'right'
-
-export type Quadrant = 'lu' | 'ru' | 'rd' | 'ld'
-
-export type LineType = 'broken' | 'bezier' | 'straight'
-
-export interface LineInfo {
-  id?: string
-  type: LineType
-  points: number[][]
-  centerPoint: number[]
-  extra: string
-}
-
-export interface Next {
-  id: string
-  targetComponentId: string
-  directionStart: Direction
-  directionEnd: Direction
-  lineType: LineType
-  extra: string
-}
-
-export interface ComponentType {
-  id: string
-  name: string
-  attr: Attr
-  label: string
-  props: {
-    next: Next[]
+  export interface Attr {
+    x: number
+    y: number
+    w: number
+    h: number
   }
+
+  export type Direction = 'up' | 'down' | 'left' | 'right'
+
+  export type Quadrant = 'lu' | 'ru' | 'rd' | 'ld'
+
+  export type LineType = 'broken' | 'bezier' | 'straight'
+
+  export interface LineInfo {
+    id?: string
+    type: LineType
+    points: [number, number][]
+    centerPoint: [number, number]
+    extra: string
+  }
+
+  export interface Next {
+    id: string
+    targetComponentId: string
+    directionStart: Direction
+    directionEnd: Direction
+    lineType: LineType
+    extra: string
+    componentId?: string
+  }
+
+  export interface PropItem {
+    label?: string
+    name: string
+    value: string,
+    type: 'input' | 'select',
+    props?: Record<string, any>
+    options?: {
+      label: string,
+      value: string
+    }[]
+  }
+
+  export interface ComponentType {
+    id: string
+    name: string
+    attr: Attr
+    label: string
+    displayName?: string
+    className?: string
+    next: Next[]
+    props: PropItem[]
+    events?: Record<string, any>
+  }
+
+  interface DrawDirections {
+    startx: number
+    starty: number
+    destx: number
+    desty: number
+  }
+
+  interface Points extends DrawDirections {
+    w: number
+    h: number
+    dw: number
+    dh: number
+  }
+
+  export interface CalcType extends Points {
+    startDire: Direction
+    destDire?: Direction
+    type?: LineType
+  }
+
+  export interface CalcBezierType extends DrawDirections {
+    startDire: Direction
+    destDire?: Direction
+    type?: LineType
+  }
+
+  export interface DrawLineType {
+    ctx: CanvasRenderingContext2D
+    points: [number, number][]
+  }
+
+  export interface AllType extends CalcType {
+    ctx: CanvasRenderingContext2D
+    type: LineType
+    id?: string
+    extra?: string
+  }
+
+  export interface EditingLineInfo {
+    id: string
+    text: string
+    point: [number, number]
+  }
+
 }
 
-interface Points {
-  w: number
-  h: number
-  dw: number
-  dh: number
-  startx: number
-  starty: number
-  destx: number
-  desty: number
-}
-
-export interface CalcType extends Points {
-  startDire: Direction
-  destDire?: Direction
-  type?: LineType
-}
-
-export interface DrawLineType {
-  ctx: CanvasRenderingContext2D
-  points: number[][]
-}
-
-export interface AllType extends CalcType {
-  ctx: CanvasRenderingContext2D
-  type: LineType
-  id?: string
-  extra?: string
-}
-
-export interface EditingLineInfo {
-  id: string
-  text: string
-  point: number[]
-}
+export default WF

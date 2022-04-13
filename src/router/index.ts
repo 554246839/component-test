@@ -23,7 +23,7 @@ const baseRoutes: VueRouter.RouteRecordRaw[] = [
   },
   {
     path: '/workflow',
-    name: 'Workflow',
+    name: 'WorkflowPage',
     component: () => import('@/views/workflow/index.vue')
   }
 ]

@@ -12,7 +12,7 @@
  * @param y 终点 y
  */
 
-export const drawArrow = (ctx: CanvasRenderingContext2D, sp: number[], ep: number[]) => {
+export const drawArrow = (ctx: CanvasRenderingContext2D, sp: [number, number], ep: [number, number]) => {
   const { x1, y1, x2, y2 } = getArrowPoints(sp, ep)
   ctx.beginPath()
   //画箭头头部
@@ -25,7 +25,7 @@ export const drawArrow = (ctx: CanvasRenderingContext2D, sp: number[], ep: numbe
 }
 
 // 获取箭头两侧的两点坐标
-const getArrowPoints = (sp: number[], ep: number[]) => {
+const getArrowPoints = (sp: [number, number], ep: [number, number]) => {
   const hd = Math.atan2(sp[1] - ep[1], sp[0] - ep[0]) // 获取角度
   const angle = (360 + (180 / Math.PI * hd | 0)) % 360 // 获取起点到终点的角度
   const leftAngle = (angle + 30 + 360) % 360 // 箭头分侧的角度

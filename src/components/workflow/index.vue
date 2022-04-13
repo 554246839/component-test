@@ -1,48 +1,40 @@
 <template>
   <div class="workflow-top">
-    <el-button
-      size="small"
-      :disabled="currentComponentIndex <= 0"
-      @click="undo"
-    >撤销</el-button>
-    <el-button
-      size="small"
-      :disabled="currentComponentIndex >= cacheComponentList.length - 1"
-      @click="redo"
-    >恢复</el-button>
-    <el-button
-      size="small"
-      disabled
-    >锁定</el-button>
-    <el-button
-      :type="lineType === 'straight' ? 'primary' : 'default'"
-      size="small"
-      @click="changelineType('straight')"
-    >直线</el-button>
-    <el-button
-      :type="lineType === 'broken' ? 'primary' : 'default'"
-      size="small"
-      @click="changelineType('broken')"
-    >折线</el-button>
-    <!-- <el-button
-      :type="lineType === 'bezier' ? 'primary' : 'default'"
-      size="small"
-      @click="changelineType('bezier')"
-    >曲线</el-button>-->
-    <el-button
-      size="small"
-      @click="clearCanvas"
-    >清空画布</el-button>
+    <wf-btn
+      :current-component-index="currentComponentIndex"
+      :cachelength="cacheComponentList.length"
+      :line-type="lineType"
+      @undo="undo"
+      @redo="redo"
+      @changelineType="changelineType"
+      @clearCanvas="clearCanvas"
+    />
+    <slot name="btn" />
   </div>
-  <div class="workflow-main">
+  <div
+    class="workflow-main"
+    :style="{ height: mainHeight }"
+  >
     <div class="workflow-left">
-      <div
-        v-for="(component, index) in componentList"
-        :key="component.id"
-        class="component-item"
-        draggable="true"
-        @dragstart="dragstart($event, index)"
-      >{{ component.label }}</div>
+      <el-scrollbar style="padding: 10px;">
+        <div
+          v-for="(component, index) in componentList"
+          :key="component.id"
+          class="component-item"
+          draggable="true"
+          @dragstart="dragstart($event, index)"
+        >
+          <slot
+            v-if="$slots.left"
+            :component="component"
+            :index="index"
+            name="left"
+          />
+          <div v-else>
+            <span>{{ component.label }}</span>
+          </div>
+        </div>
+      </el-scrollbar>
     </div>
     <div
       ref="middleRef"
@@ -55,7 +47,7 @@
           transform: `translate(${left}px, ${top}px)`
         }"
         @dragover="dragover"
-        @drop="ondrop($event, componentRenderList)"
+        @drop="ondrop"
       >
         <canvas
           id="mask-canvas"
@@ -64,7 +56,7 @@
         <div
           class="workflow-container"
           data-type="container"
-          :style="{ width, height, cursor: canvasCursor }"
+          :style="{ width: width, height: height, cursor: canvasCursor }"
           @mousedown="containerDown"
           @contextmenu="customMenu"
           @mousemove.self="canvasMove"
@@ -84,12 +76,14 @@
             }"
           >
             <div
-              class="component-container"
+              :class="['component-container', component.className]"
               @mousedown.stop="componentMouseDown($event, component)"
               @mouseup.stop="drawLineEnd($event, 'parent', component)"
               @mousemove.self="componentMouseMove($event, component)"
               @mouseleave="drawLineLeave"
-            >{{ editStatus && activeComponet === component ? '' : component.label }}</div>
+            >
+              {{ editStatus && activeComponet === component ? '' : component.displayName }}
+            </div>
             <div
               class="shape-point up"
               :style="{
@@ -171,7 +165,7 @@
               contenteditable
               @blur="writeContainerBlur"
               @keydown.enter="writeContainerBlur"
-              v-text="activeComponet.label"
+              v-text="activeComponet.displayName"
             ></div>
           </div>
           <!-- 所有的线文本展示 -->
@@ -228,63 +222,123 @@
         </div>
       </div>
     </div>
-    <div class="workflow-right"></div>
+    <div class="workflow-right">
+      <el-scrollbar style="padding: 10px;">
+        <slot
+          v-if="$slots.right"
+          :component="activeComponet"
+          name="right"
+        />
+        <div v-else>
+          <div class="component-attr-title">{{ activeComponet?.label }}</div>
+          <el-form
+            v-if="activeComponet"
+            label-position="top"
+          >
+            <el-form-item
+              v-for="copProp in activeComponet.props"
+              :key="copProp.name"
+              :label="copProp.label || copProp.name"
+            >
+              <el-input
+                v-if="copProp.type === 'input'"
+                v-model="copProp.value"
+                clearable
+                v-bind="copProp.props || {}"
+              >
+              </el-input>
+              <el-select
+                v-else-if="copProp.type === 'select'"
+                v-model="copProp.value"
+                clearable
+                v-bind="copProp.props || {}"
+              >
+                <el-option
+                  v-for="opt in copProp.options"
+                  :key="opt.value"
+                  :label="opt.label"
+                  :value="opt.value"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-scrollbar>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { onMounted, onUnmounted, ref, nextTick, computed } from 'vue'
-import { ComponentType, Attr, Direction, Quadrant, LineType, LineInfo, EditingLineInfo } from './type'
-import componentList from './component-list'
+import { onMounted, onUnmounted, ref, nextTick, computed, PropType } from 'vue'
+import WF from './type'
 import { dragover, drop, dragstart } from './drag-event'
 import changeComponentSize, { changeAreaSize } from './change-size'
 import drawLine, { drawCacheLine, drawGridLine, checkHasLine, calcXY } from './calc-line-point/draw-line'
 import {
   getPosition, getUUID, isAboveLine, removeLine, removeComponent,
-  selectAllContent, updateComponentLineText, getSelectedComponent
+  selectAllContent, updateComponentLineText, getSelectedComponent,
 } from './utils'
 import { calcLineData, getComponentPosition } from './calc-line-data'
 import { clearupPostions, getAdsordXY } from './adsorb'
 
+import WfBtn from './components/WfBtn.vue'
+
 export default {
-  name: 'WorkflowComponent'
+  name: 'Workflow'
 }
 </script>
 
 <script lang="ts" setup>
-const componentRenderList = ref<ComponentType[]>([]) // 已渲染的组件列表
-const selectedComponents = ref<ComponentType[]>([])
-const activeComponet = ref<ComponentType>() // 当前选中的组件
-const maskCanvas = ref<HTMLCanvasElement>() // canvas dom 实例
+
+const props = defineProps({
+  config: {
+    type: Array as PropType<WF.ComponentType[]>,
+    default: () => []
+  },
+  mainHeight: {
+    type: String,
+    default: 'calc(100vh - 65px)'
+  }
+})
+
+const emits = defineEmits([
+  'component-change',
+  'line-change'
+])
+
+const componentList = ref<WF.ComponentType[]>(props.config) // 节点配置列表
+const componentRenderList = ref<WF.ComponentType[]>([]) // 已渲染的组件列表
+const selectedComponents = ref<WF.ComponentType[]>([])
+const activeComponet = ref<WF.ComponentType>()    // 当前选中的组件
+const maskCanvas = ref<HTMLCanvasElement>()       // canvas dom 实例
 const editorContainerRef = ref<HTMLDivElement>()  // 组件的可编辑容器
-const maskRef = ref<HTMLDivElement>() // 背景 dom 实例
+const maskRef = ref<HTMLDivElement>()   // 背景 dom 实例
 const middleRef = ref<HTMLDivElement>() // 中间渲染实例
-const editStatus = ref(false) // 组件信息编辑状态
-const lineType = ref<LineType>('broken')  // 当前线类型
-const allLinePoints = ref<LineInfo[]>([]) // 所有连线的坐标点
-const areaPoint = ref<Attr>() // 组件拉伸点的坐标
-let cacheLineType: LineType = 'broken'  // 缓存线类型
-let ctx: CanvasRenderingContext2D // canvas 2d 实例
+const editStatus = ref(false)           // 组件信息编辑状态
+const lineType = ref<WF.LineType>('broken')   // 当前线类型
+const allLinePoints = ref<WF.LineInfo[]>([])  // 所有连线的坐标点
+const areaPoint = ref<WF.Attr>()              // 组件拉伸点的坐标
+let cacheLineType: WF.LineType = 'broken'     // 缓存线类型
+let ctx: CanvasRenderingContext2D             // canvas 2d 实例
 let canvasWidth: number
 let canvasHeight: number
-let activeLinePoints: LineInfo  // 正在拖拽绘制的连线
+let activeLinePoints: WF.LineInfo  // 正在拖拽绘制的连线
 
 // 撤销和恢复操作
-const cacheComponentList = ref<ComponentType[][]>([[]])
-const currentComponentIndex = ref(0)
+const cacheComponentList = ref<WF.ComponentType[][]>([])
+const currentComponentIndex = ref(-1)
 // 撤销
 const undo = () => {
   componentRenderList.value = JSON.parse(JSON.stringify(cacheComponentList.value[--currentComponentIndex.value]))
   updateCanvas(true)
   cancelSelected()
-  activeComponet.value = undefined
 }
 // 恢复
 const redo = () => {
   componentRenderList.value = JSON.parse(JSON.stringify(cacheComponentList.value[++currentComponentIndex.value]))
   updateCanvas(true)
   cancelSelected()
-  activeComponet.value = undefined
 }
 // 缓存入栈
 const chacheStack = () => {
@@ -294,19 +348,19 @@ const chacheStack = () => {
   cacheComponentList.value.push(JSON.parse(JSON.stringify(componentRenderList.value)))
   currentComponentIndex.value++
 }
-
+chacheStack()
 
 let disx = 0
 let disy = 0
 const left = ref(disx)
 const top = ref(disy)
-const width = ref('0')
-const height = ref('0')
-const areaPosi = ref<Attr>()
+const width = ref('0px')
+const height = ref('0px')
+const areaPosi = ref<WF.Attr>()
 const adsordPoint = ref<(number | null)[]>([null, null])
 
 const lineExtraInfos = computed(() => {
-  const infos: EditingLineInfo[] = []
+  const infos: WF.EditingLineInfo[] = []
   for (const val of allLinePoints.value) {
     if (val.extra) {
       infos.push({
@@ -317,6 +371,18 @@ const lineExtraInfos = computed(() => {
     }
   }
   return infos
+})
+
+const allNextLines = computed(() => {
+  const nexts: Record<string, WF.Next & { componentId: string }> = {}
+
+  componentRenderList.value.forEach((component: WF.ComponentType) => {
+    component.next.forEach((next: WF.Next) => {
+      nexts[next.id] = Object.assign(next, { componentId: component.id })
+    })
+  })
+
+  return nexts
 })
 
 onMounted(() => {
@@ -330,8 +396,8 @@ onMounted(() => {
   width.value = `${maskWidth - 80}px`
   height.value = `${maskHeight - 80}px`
 
-  disx = (middleWidth - maskWidth) / 2 - 10
-  disy = (middleHeight - maskHeight) / 2 - 10
+  disx = (middleWidth - maskWidth + 80) / 2
+  disy = (middleHeight - maskHeight + 80) / 2
   left.value = disx
   top.value = disy
 
@@ -343,6 +409,8 @@ onMounted(() => {
     ctx, canvasWidth, canvasHeight, 20
   )
 
+  updateCanvas(true)
+
   document.addEventListener('mousemove', mouseMove)
   document.addEventListener('mouseup', mouseUp)
   document.addEventListener('keydown', keydown)
@@ -353,16 +421,16 @@ onUnmounted(() => {
   document.removeEventListener('keydown', keydown)
 })
 
-const ondrop = (e: DragEvent, componentRenderList: ComponentType[]) => {
+const ondrop = (e: DragEvent) => {
   cancelSelected()
-  drop(e, componentRenderList)
+  drop(e, componentList.value, componentRenderList.value)
   chacheStack()
 }
 
-let isMoveComponent = false, pagex = 0, pagey = 0, cacheAttr: Attr
-let otherCoords: Set<number>[] = [], allSelectdAttr: Attr[] = []
+let isMoveComponent = false, pagex = 0, pagey = 0, cacheAttr: WF.Attr
+let otherCoords: Set<number>[] = [], allSelectdAttr: WF.Attr[] = []
 // 组件拖动
-const componentMouseDown = (e: MouseEvent, component: ComponentType, isMask?: boolean) => {
+const componentMouseDown = (e: MouseEvent, component: WF.ComponentType, isMask?: boolean) => {
   if (editStatus.value) {
     return
   }
@@ -371,27 +439,26 @@ const componentMouseDown = (e: MouseEvent, component: ComponentType, isMask?: bo
   }
   // 解决一个组件在编辑的状态，直接点击另一个组件，导致之前的编辑内容保存失败
   setTimeout(() => {
+    isMoveComponent = true
+    pagex = e.pageX
+    pagey = e.pageY
+
     if (hasSelectComponent) {
-      isMoveComponent = true
-      pagex = e.pageX
-      pagey = e.pageY
-      cacheAttr = { ...areaPoint.value as Attr }
-      allSelectdAttr = selectedComponents.value.map((component: ComponentType) => {
+      cacheAttr = { ...areaPoint.value as WF.Attr }
+      allSelectdAttr = selectedComponents.value.map((component: WF.ComponentType) => {
         return { ...component.attr }
       })
       return
     }
-    isMoveComponent = true
-    pagex = e.pageX
-    pagey = e.pageY
     cacheAttr = { ...component.attr }
     activeComponet.value = component
     areaPoint.value = component.attr
     otherCoords = clearupPostions(componentRenderList.value, component.id)
+    emits('component-change', component)
   })
 }
 // 获取连线状态下，组件悬浮下的就近连接点
-const componentMouseMove = (e: MouseEvent, component: ComponentType) => {
+const componentMouseMove = (e: MouseEvent, component: WF.ComponentType) => {
   if (!drawLineStatus) { return }
   directionEnd = getPosition(component, e.offsetX, e.offsetY)
   targetComponent = component
@@ -409,7 +476,7 @@ const containerDown = (e: MouseEvent) => {
   } else if (e.buttons === 1) {
     areaSelect.value = true
     otherCoords = []
-    cancelSelected()
+    cancelSelected(true)
     pagex = e.pageX
     pagey = e.pageY
     areaPosi.value = {
@@ -427,8 +494,8 @@ const customMenu = (e: MouseEvent) => {
   e.preventDefault()
 }
 const canvasCursor = ref('default')
-let lastAboveLine: LineInfo | null // 最后一根鼠标接触过的线
-let highlightLine: LineInfo | null // 当前高亮的线
+let lastAboveLine: WF.LineInfo | null // 最后一根鼠标接触过的线
+let highlightLine: WF.LineInfo | null // 当前高亮的线
 let isAbove = false // 是否在线上
 // 无状态下鼠标下是否有线
 const canvasMove = (e: MouseEvent) => {
@@ -445,6 +512,7 @@ const canvasMove = (e: MouseEvent) => {
 
     canvasCursor.value = 'default'
     isAbove = false
+    lastAboveLine = null
     // 返回当前的线
     if (result) {
       canvasCursor.value = 'pointer'
@@ -479,7 +547,7 @@ const mouseMove = (e: MouseEvent) => {
     } else {
       const x = e.pageX - pagex
       const y = e.pageY - pagey
-      selectedComponents.value.forEach((component: ComponentType, index: number) => {
+      selectedComponents.value.forEach((component: WF.ComponentType, index: number) => {
         component!.attr.x = allSelectdAttr[index].x + x
         component!.attr.y = allSelectdAttr[index].y + y
         areaPoint.value!.x = cacheAttr.x + x
@@ -518,7 +586,7 @@ const mouseMove = (e: MouseEvent) => {
   } else if (changeSizeStatus) {
     // 调整组件大小
     if (hasSelectComponent) {
-      selectedComponents.value.forEach((component: ComponentType, index: number) => {
+      selectedComponents.value.forEach((component: WF.ComponentType, index: number) => {
         changeComponentSize(
           e, component, quadrant, pagex, pagey, allSelectdAttr[index], areaPoint.value, cacheAttr
         )
@@ -569,7 +637,7 @@ const mouseUp = () => {
 // 判断该组件是否被选中
 const isSelectedComponent = (componentId: string) => {
   return activeComponet.value?.id === componentId ||
-    selectedComponents.value.find((component: ComponentType) => component.id === componentId)
+    selectedComponents.value.find((component: WF.ComponentType) => component.id === componentId)
 }
 
 // 删除组件和线
@@ -577,7 +645,7 @@ const keydown = (e: KeyboardEvent) => {
   if (e.key === 'Delete') {
     // 删除选中组件
     if (hasSelectComponent) {
-      selectedComponents.value.forEach((component: ComponentType) => {
+      selectedComponents.value.forEach((component: WF.ComponentType) => {
         removeComponent(componentRenderList.value, allLinePoints.value, component.id)
       })
       cancelSelected()
@@ -617,6 +685,7 @@ const maskClick = () => {
 
     if (isAbove) {
       updateCanvas(false, lastAboveLine!)
+      emits('line-change', allNextLines.value[lastAboveLine!.id!])
     } else if (highlightLine) {
       updateCanvas()
       highlightLine = null
@@ -630,7 +699,7 @@ const maskDbClick = () => {
 
   // 计算当前高亮线条的中间坐标点
   if (isAbove) {
-    const targetExtra = lineExtraInfos.value.find((extra: EditingLineInfo) => {
+    const targetExtra = lineExtraInfos.value.find((extra: WF.EditingLineInfo) => {
       return extra.id === lastAboveLine?.id
     })
     editExtraInfo(targetExtra || {
@@ -642,13 +711,13 @@ const maskDbClick = () => {
 }
 
 let drawLineStatus = false
-let directionStart: Direction
-let directionEnd: Direction | undefined
-let targetComponent: ComponentType
+let directionStart: WF.Direction
+let directionEnd: WF.Direction | undefined
+let targetComponent: WF.ComponentType
 let startx: number
 let starty: number
 // 连线起点
-const drawLineStart = (e: MouseEvent, type: Direction, component: ComponentType) => {
+const drawLineStart = (e: MouseEvent, type: WF.Direction, component: WF.ComponentType) => {
   drawLineStatus = true
   activeComponet.value = component
   areaPoint.value = component.attr
@@ -662,7 +731,7 @@ const drawLineStart = (e: MouseEvent, type: Direction, component: ComponentType)
   starty = y
 }
 // 连线状态进入组件
-const drawLineOver = (type: Direction, component: ComponentType) => {
+const drawLineOver = (type: WF.Direction, component: WF.ComponentType) => {
   if (drawLineStatus && (activeComponet.value !== component || type !== directionStart)) {
     directionEnd = type
     targetComponent = component
@@ -675,45 +744,51 @@ const drawLineLeave = () => {
   }
 }
 // 连线结束
-const drawLineEnd = (e: MouseEvent, type: Direction | 'parent', component: ComponentType) => {
+const drawLineEnd = (e: MouseEvent, type: WF.Direction | 'parent', component: WF.ComponentType) => {
   if (isMoveComponent) {
     isMoveComponent = false
   }
   if (!drawLineStatus) {
     return
   }
-  let direction
-  if (type === 'parent') {
-    direction = getPosition(component, e.offsetX, e.offsetY)
+  if (type !== 'parent') {
+    directionEnd = type
+  } else if (!directionEnd) {
+    directionEnd = getPosition(component, e.offsetX, e.offsetY)
   }
-  directionEnd = direction || type as Direction
   const id = getUUID()
-  if (activeComponet.value !== component || directionStart !== type || !checkHasLine(type, activeComponet.value.props.next, component)) {
-    activeComponet.value?.props.next.push({
-      id,
-      targetComponentId: component.id,
-      directionStart,
-      directionEnd,
-      lineType: lineType.value,
-      extra: ''
-    })
-    allLinePoints.value.push({ ...activeLinePoints, id })
-    chacheStack()
+  if ((activeComponet.value === component && directionStart === directionEnd) ||
+    checkHasLine(
+      directionStart, directionEnd, activeComponet.value!, component
+    )
+  ) {
+    drawLineStatus = false
+    return
   }
+  activeComponet.value?.next.push({
+    id,
+    targetComponentId: component.id,
+    directionStart,
+    directionEnd,
+    lineType: lineType.value,
+    extra: ''
+  })
+  allLinePoints.value.push({ ...activeLinePoints, id })
+  chacheStack()
   drawLineStatus = false
 }
 
 let changeSizeStatus = false
-let quadrant: Quadrant // 四象限
+let quadrant: WF.Quadrant // 四象限
 // 四个角拖拽改变组件大小
-const changeSizeStart = (e: MouseEvent, type: Quadrant, component: ComponentType) => {
+const changeSizeStart = (e: MouseEvent, type: WF.Quadrant, component: WF.ComponentType) => {
   changeSizeStatus = true
   quadrant = type
   pagex = e.pageX
   pagey = e.pageY
   if (hasSelectComponent) {
-    cacheAttr = { ...areaPoint.value as Attr }
-    allSelectdAttr = selectedComponents.value.map((component: ComponentType) => {
+    cacheAttr = { ...areaPoint.value as WF.Attr }
+    allSelectdAttr = selectedComponents.value.map((component: WF.ComponentType) => {
       return { ...component.attr }
     })
   } else {
@@ -725,7 +800,7 @@ const changeSizeStart = (e: MouseEvent, type: Quadrant, component: ComponentType
  * 更新canvas
  * @param update 是否更新全部line
  */
-const updateCanvas = (update = false, al?: LineInfo) => {
+const updateCanvas = (update = false, al?: WF.LineInfo) => {
   maskCanvas.value!.width = canvasWidth
   maskCanvas.value!.height = canvasHeight
 
@@ -741,11 +816,10 @@ const updateCanvas = (update = false, al?: LineInfo) => {
   } else {
     lineType.value = cacheLineType
   }
-
   // 不更新
   if (!update) {
     if (allLinePoints.value.length) {
-      allLinePoints.value.forEach((lineInfo: LineInfo) => {
+      allLinePoints.value.forEach((lineInfo: WF.LineInfo) => {
         const highlight = !!al && lineInfo.id === al.id
         drawCacheLine(
           ctx, lineInfo.type, lineInfo.points, highlight
@@ -759,22 +833,23 @@ const updateCanvas = (update = false, al?: LineInfo) => {
   allLinePoints.value.length = 0
   if (lines.length) {
     lines.forEach((v: any) => {
-      allLinePoints.value.push(drawLine({ ctx, ...v }))
+      allLinePoints.value.push(drawLine({ ctx, ...v }, !!al && v.id === al.id))
     })
   }
 }
 
 // 改变类型
-const changelineType = (type: LineType) => {
+const changelineType = (type: WF.LineType) => {
   lineType.value = type
   // 更改高亮线的类型
   if (highlightLine && highlightLine.type !== type) {
     for (let c = 0; c < componentRenderList.value.length; c++) {
-      const next = componentRenderList.value[c].props.next
+      const next = componentRenderList.value[c].next
       for (let i = 0; i < next.length; i++) {
         if (next[i].id === highlightLine.id) {
           next[i].lineType = type
-          updateCanvas(true)
+          highlightLine.type = type
+          updateCanvas(true, highlightLine)
           chacheStack()
           return
         }
@@ -810,8 +885,8 @@ const writeContainerBlur = (e: FocusEvent | KeyboardEvent) => {
   editStatus.value = false
   if (activeComponet.value) {
     const val = (e.target as HTMLDivElement).innerText.trim()
-    if (activeComponet.value.label !== val) {
-      activeComponet.value.label = val
+    if (activeComponet.value.displayName !== val) {
+      activeComponet.value.displayName = val
       chacheStack()
     }
   }
@@ -820,8 +895,8 @@ const writeContainerBlur = (e: FocusEvent | KeyboardEvent) => {
 // 编辑线的信息
 const editExtraInfoRef = ref<HTMLDivElement>()
 const editExtraInfoStatus = ref(false)
-const activeExtraInfo = ref<EditingLineInfo>()
-const editExtraInfo = (extra: EditingLineInfo) => {
+const activeExtraInfo = ref<WF.EditingLineInfo>()
+const editExtraInfo = (extra: WF.EditingLineInfo) => {
   editExtraInfoStatus.value = true
   activeExtraInfo.value = extra
   nextTick(() => {
@@ -842,12 +917,26 @@ const editExtraInfoBlur = () => {
 }
 
 // 选中组件列表状态取消
-const cancelSelected = () => {
+const cancelSelected = (dc?: boolean) => {
   hasSelectComponent = false
   selectedComponents.value = []
-  activeComponet.value = undefined
   areaPoint.value = undefined
+  !dc && (activeComponet.value = undefined)
 }
+
+defineExpose({
+  setConfig: (config: WF.ComponentType[]) => {
+    componentList.value = config
+  },
+  setData: (data: WF.ComponentType[]) => {
+    componentRenderList.value = data
+    updateCanvas(true)
+    chacheStack()
+  },
+  getData: () => {
+    return componentRenderList.value
+  }
+})
 </script>
 
 <style lang="scss">

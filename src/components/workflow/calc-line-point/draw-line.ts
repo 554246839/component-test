@@ -4,28 +4,29 @@
  * Author: Kang Dong
  */
 
-import {
-  ComponentType, Next, Direction, Quadrant, LineType,
-  AllType, DrawLineType, CalcType
-} from '../type'
+import WF from '../type'
 import drawArrow from '../draw-arrow'
-import { getCenterPoint } from '../utils'
+import { getCenterPoint, getThreeBezierPoint } from '../utils'
 import calcStraightPoints from './calc-straight-points'
-import calcBerzierPoints from './calc-berzier-points'
+import calcBezierPoints from './calc-bezier-points'
 
 // 高亮连线的处理
-const SHADOWCOLOR = '#f56c6c'
+const SHADOWCOLOR = '#59c7f9', COMMONCOLOR = '#747480'
 const shadowLine = (ctx: CanvasRenderingContext2D, highlight?: boolean) => {
+  ctx.lineWidth = 2
   if (highlight) {
     ctx.shadowBlur = 2
     ctx.shadowColor = SHADOWCOLOR
+    ctx.strokeStyle = SHADOWCOLOR
   } else {
     ctx.shadowBlur = 0
     ctx.shadowColor = 'transparent'
+    ctx.strokeStyle = COMMONCOLOR
   }
 }
 
-export default function drawLine({ ctx, startx, starty, startDire, destx, desty, destDire, w, h, dw, dh, type = 'broken', id, extra = '' }: AllType) {
+export default function drawLine({ ctx, startx, starty, startDire, destx, desty, destDire, w, h, dw, dh, type = 'broken', id, extra = '' }: WF.AllType,
+  highlight?: boolean) {
 
   if (!destDire) {
     if (Math.abs(desty - starty) >= Math.abs(destx - startx)) {
@@ -43,19 +44,19 @@ export default function drawLine({ ctx, startx, starty, startDire, destx, desty,
     }
   }
 
-  const points = calcPoints({ startx, starty, startDire, destx, desty, destDire, type, w, h, dw, dh, })
+  const points = calcPoints({ startx, starty, startDire, destx, desty, destDire, type, w, h, dw, dh })
 
   if (type === 'broken') {
-    drawBrokenLine({ ctx, points })
+    drawBrokenLine({ ctx, points }, highlight)
   } else if (type === 'bezier') {
-    drawBezier({ ctx, points })
+    drawBezier({ ctx, points }, highlight)
   } else {
-    drawStraightLine(ctx, [[startx, starty], [destx, desty]])
+    drawStraightLine(ctx, [[startx, starty], [destx, desty]], highlight)
   }
 
   drawArrow(ctx, points[points.length - 2], points[points.length - 1])
 
-  // 获取终点坐标
+  // 获取中点坐标
   const centerPoint = getCenterPoint(points, type)
 
   return { type, points, id, centerPoint, extra }
@@ -63,7 +64,10 @@ export default function drawLine({ ctx, startx, starty, startDire, destx, desty,
 
 // 绘制缓存line
 export const drawCacheLine = (
-  ctx: CanvasRenderingContext2D, type: LineType, points: number[][], highlight?: boolean
+  ctx: CanvasRenderingContext2D,
+  type: WF.LineType,
+  points: [number, number][],
+  highlight?: boolean
 ) => {
   if (points?.length) {
     if (type === 'broken') {
@@ -79,7 +83,7 @@ export const drawCacheLine = (
 }
 
 // 计算连线区域的x, y
-export const calcXY = (type: Direction, component: ComponentType) => {
+export const calcXY = (type: WF.Direction, component: WF.ComponentType) => {
   const attr = component.attr
   let { x, y } = attr
 
@@ -127,19 +131,19 @@ export const drawGridLine = (
 }
 
 // 检查是否存在同样的线 
-export const checkHasLine = (type: Direction, originNext: Next[], component: ComponentType) => {
-  return originNext.findIndex((v: Next) => {
-    return v.id === component.id && v.directionEnd === type
+export const checkHasLine = (
+  directionStart: WF.Direction, directionEnd: WF.Direction, originComponent: WF.ComponentType, component: WF.ComponentType
+) => {
+  return originComponent.next.findIndex((v: WF.Next) => {
+    return v.targetComponentId === component.id && v.directionEnd === directionEnd && v.directionStart === directionStart
   }) > -1
 }
 
 // 绘制直线
-const drawStraightLine = (ctx: CanvasRenderingContext2D, points: number[][], highlight?: boolean) => {
+const drawStraightLine = (ctx: CanvasRenderingContext2D, points: [number, number][], highlight?: boolean) => {
   ctx.beginPath()
   ctx.moveTo(points[0][0], points[0][1])
   ctx.lineTo(points[1][0], points[1][1])
-  ctx.lineWidth = 2
-  ctx.strokeStyle = '#000'
   shadowLine(ctx, highlight)
   ctx.stroke()
   ctx.restore()
@@ -147,14 +151,12 @@ const drawStraightLine = (ctx: CanvasRenderingContext2D, points: number[][], hig
 }
 
 // 绘制折线
-const drawBrokenLine = ({ ctx, points }: DrawLineType, highlight?: boolean) => {
+const drawBrokenLine = ({ ctx, points }: WF.DrawLineType, highlight?: boolean) => {
   ctx.beginPath()
   ctx.moveTo(points[0][0], points[0][1])
   for (let i = 1; i < points.length; i++) {
     ctx.lineTo(points[i][0], points[i][1])
   }
-  ctx.lineWidth = 2
-  ctx.strokeStyle = '#000'
   shadowLine(ctx, highlight)
   ctx.stroke()
   ctx.restore()
@@ -162,9 +164,7 @@ const drawBrokenLine = ({ ctx, points }: DrawLineType, highlight?: boolean) => {
 }
 
 // 绘制贝塞尔曲线
-const drawBezier = ({ ctx, points }: DrawLineType, highlight?: boolean) => {
-  ctx.beginPath()
-  ctx.strokeStyle = 'blue'
+const drawBezier = ({ ctx, points }: WF.DrawLineType, highlight?: boolean) => {
   ctx.beginPath()
   ctx.moveTo(points[0][0], points[0][1])
   ctx.bezierCurveTo(
@@ -175,21 +175,20 @@ const drawBezier = ({ ctx, points }: DrawLineType, highlight?: boolean) => {
   ctx.restore()
   ctx.globalCompositeOperation = 'source-over'    //目标图像上显示源图像
 
-  //绘制上面曲线的控制点和控制线，控制点坐标为两直线的交点(75,50)
-  ctx.strokeStyle = 'red'
-  ctx.beginPath()
-  ctx.moveTo(points[0][0], points[0][1])
-  ctx.lineTo(points[1][0], points[1][1])
-  ctx.lineTo(points[2][0], points[2][1])
-  ctx.lineTo(points[3][0], points[3][1])
-  ctx.stroke()
-
-  ctx.closePath()
+  // 绘制上面曲线的控制点和控制线，控制点坐标为两直线的交点(75,50)
+  // ctx.strokeStyle = 'red'
+  // ctx.beginPath()
+  // ctx.moveTo(points[0][0], points[0][1])
+  // for (let i = 1; i < points.length; i++) {
+  //   ctx.lineTo(points[i][0], points[i][1])
+  // }
+  // ctx.stroke()
+  // ctx.closePath()
 }
 
-let quadrant: Quadrant
-const calcPoints = ({ startDire, startx, starty, destDire, destx, desty, type, w, h, dw, dh }: CalcType) => {
-  const points: number[][] = [[startx, starty]]
+let quadrant: WF.Quadrant
+const calcPoints = ({ startDire, startx, starty, destDire, destx, desty, type, w, h, dw, dh }: WF.CalcType) => {
+  const points: [number, number][] = [[startx, starty]]
 
   if (startx > destx) {
     if (starty > desty) {
@@ -207,8 +206,8 @@ const calcPoints = ({ startDire, startx, starty, destDire, destx, desty, type, w
 
   if (type === 'broken') {
     calcStraightPoints({ startDire, startx, starty, destDire, destx, desty, w, h, dw, dh, }, points, quadrant)
-  } else {
-    calcBerzierPoints({ startDire, startx, starty, destDire, destx, desty, w, h, dw, dh, }, points, quadrant)
+  } else if (type === 'bezier') {
+    calcBezierPoints({ startDire, startx, starty, destDire, destx, desty }, points)
   }
 
   points.push([destx, desty])

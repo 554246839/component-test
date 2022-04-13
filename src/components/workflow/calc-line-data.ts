@@ -4,16 +4,16 @@
  * Author: Kang Dong
  */
 
-import { ComponentType, Direction, Next } from './type'
+import WF from './type'
 
-export const calcLineData = (componentList: ComponentType[]) => {
+export const calcLineData = (componentList: WF.ComponentType[]) => {
   const lines: Record<string, any>[] = []
   const hashComponents = changeArray2Obj(componentList)
-  componentList.forEach((component: ComponentType) => {
-    if (!component.props.next.length) {
+  componentList.forEach((component: WF.ComponentType) => {
+    if (!component.next.length) {
       return
     }
-    component.props.next.forEach((next: Next) => {
+    component.next.forEach((next: WF.Next) => {
       const targetComponent = hashComponents[next.targetComponentId]
       lines.push({
         startx: getComponentPosition(component, next.directionStart)[0],
@@ -36,16 +36,16 @@ export const calcLineData = (componentList: ComponentType[]) => {
 }
 
 // 组件列表转换 hash
-const changeArray2Obj = (componentList: ComponentType[]) => {
-  const result: Record<string, ComponentType> = {}
-  componentList.forEach((c: ComponentType) => {
+const changeArray2Obj = (componentList: WF.ComponentType[]) => {
+  const result: Record<string, WF.ComponentType> = {}
+  componentList.forEach((c: WF.ComponentType) => {
     result[c.id] = c
   })
   return result
 }
 
 // 获取组件不同方向对应的坐标值
-export const getComponentPosition = (component: ComponentType, direction: Direction) => {
+export const getComponentPosition = (component: WF.ComponentType, direction: WF.Direction) => {
   const { x, y, w, h } = component.attr
 
   if (direction === 'up') {

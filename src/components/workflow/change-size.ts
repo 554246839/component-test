@@ -4,17 +4,17 @@
  * Author: Kang Dong
  */
 
-import { ComponentType, Attr } from './type'
+import WF from './type'
 
 export default function changeComponentSize(
   e: MouseEvent,
-  component: ComponentType,
+  component: WF.ComponentType,
   direction: 'lu' | 'ru' | 'rd' | 'ld',
   pagex: number,
   pagey: number,
-  cacheAttr: Attr,
-  areaPoint: Attr | undefined = undefined,
-  areaPointCacheAttr?: Attr
+  cacheAttr: WF.Attr,
+  areaPoint: WF.Attr | undefined = undefined,
+  areaPointCacheAttr?: WF.Attr
 ) {
   if (!component) {
     return
@@ -74,8 +74,8 @@ export const changeAreaSize = (
   e: MouseEvent,
   pagex: number,
   pagey: number,
-  areaPosi: Attr,
-  cacheAttr: Attr
+  areaPosi: WF.Attr,
+  cacheAttr: WF.Attr
 ) => {
   const w = e.pageX - pagex
   const h = e.pageY - pagey
