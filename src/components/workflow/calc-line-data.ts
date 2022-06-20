@@ -15,21 +15,26 @@ export const calcLineData = (componentList: WF.ComponentType[]) => {
     }
     component.next.forEach((next: WF.Next) => {
       const targetComponent = hashComponents[next.targetComponentId]
-      lines.push({
-        startx: getComponentPosition(component, next.directionStart)[0],
-        starty: getComponentPosition(component, next.directionStart)[1],
-        startDire: next.directionStart,
-        destx: getComponentPosition(targetComponent, next.directionEnd)[0],
-        desty: getComponentPosition(targetComponent, next.directionEnd)[1],
-        destDire: next.directionEnd,
-        w: component.attr.w,
-        h: component.attr.h,
-        dw: targetComponent.attr.w,
-        dh: targetComponent.attr.h,
-        type: next.lineType,
-        id: next.id,
-        extra: next.extra
-      })
+      const start = getComponentPosition(component, next.directionStart)
+      const dest = getComponentPosition(targetComponent, next.directionEnd)
+      if (start && dest) {
+        lines.push({
+          startx: start[0],
+          starty: start[1],
+          startDire: next.directionStart,
+          destx: dest[0],
+          desty: dest[1],
+          destDire: next.directionEnd,
+          w: component.attr.w,
+          h: component.attr.h,
+          dw: targetComponent.attr.w,
+          dh: targetComponent.attr.h,
+          type: next.lineType,
+          id: next.id,
+          displayName: next.displayName,
+          props: next.props
+        })
+      }
     })
   })
   return lines
@@ -46,6 +51,9 @@ const changeArray2Obj = (componentList: WF.ComponentType[]) => {
 
 // 获取组件不同方向对应的坐标值
 export const getComponentPosition = (component: WF.ComponentType, direction: WF.Direction) => {
+  if (!component) {
+    return
+  }
   const { x, y, w, h } = component.attr
 
   if (direction === 'up') {

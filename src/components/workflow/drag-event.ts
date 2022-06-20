@@ -26,5 +26,6 @@ export const drop = (e: DragEvent, componentList: WF.ComponentType[], componentR
   activeComponent.attr.x = e.offsetX
   activeComponent.attr.y = e.offsetY
   activeComponent.id = getUUID()
+  activeComponent.next = []
   componentRenderList.push(activeComponent)
 }

@@ -441,7 +441,6 @@ export default function calcStraightPoints({ startDire, startx, starty, destDire
           }
           break
         case 'ld': // 第三象限
-          const minx = w / 2 + firstDistance
           switch (destDire) {
             case 'down':
               {
@@ -458,14 +457,14 @@ export default function calcStraightPoints({ startDire, startx, starty, destDire
               break
             case 'up':
               points.push([startx, starty - firstDistance]) // 2
-              points.push([Math.min(startx - minx, destx), Math.min(starty - firstDistance, desty - firstDistance)]) // 3
-              points.push([Math.min(startx - minx, destx), desty - firstDistance]) // 4
+              points.push([Math.min(startx - w / 2 - firstDistance, destx), Math.min(starty - firstDistance, desty - firstDistance)]) // 3
+              points.push([Math.min(startx - w / 2 - firstDistance, destx), desty - firstDistance]) // 4
               points.push([destx, desty - firstDistance]) // 5
               break
             case 'left':
               points.push([startx, starty - firstDistance]) // 2
-              points.push([Math.min(startx - minx, destx - firstDistance), starty - firstDistance]) // 3
-              points.push([Math.min(startx - minx, destx - firstDistance), desty]) // 4
+              points.push([Math.min(startx - w / 2 - firstDistance, destx - firstDistance), starty - firstDistance]) // 3
+              points.push([Math.min(startx - w / 2 - firstDistance, destx - firstDistance), desty]) // 4
               points.push([destx - firstDistance, desty]) // 4, 5
               break
             case 'right':
@@ -486,7 +485,6 @@ export default function calcStraightPoints({ startDire, startx, starty, destDire
           }
           break
         case 'rd': // 第四象限
-          const minfx = w / 2 + firstDistance
           switch (destDire) {
             case 'down':
               {
@@ -503,10 +501,13 @@ export default function calcStraightPoints({ startDire, startx, starty, destDire
               }
               break
             case 'up':
-              points.push([startx, starty - firstDistance]) // 2
-              points.push([Math.max(startx + minfx, destx), Math.min(starty - firstDistance, desty - firstDistance)]) // 3
-              points.push([Math.max(startx + minfx, destx), desty - firstDistance]) // 4
-              points.push([destx, desty - firstDistance]) // 5
+              {
+                const minfx = w / 2 + firstDistance
+                points.push([startx, starty - firstDistance]) // 2
+                points.push([Math.max(startx + minfx, destx), Math.min(starty - firstDistance, desty - firstDistance)]) // 3
+                points.push([Math.max(startx + minfx, destx), desty - firstDistance]) // 4
+                points.push([destx, desty - firstDistance]) // 5
+              }
               break
             case 'left':
               {
@@ -523,10 +524,13 @@ export default function calcStraightPoints({ startDire, startx, starty, destDire
               }
               break
             case 'right':
-              points.push([startx, starty - firstDistance]) // 2
-              points.push([Math.max(startx + minfx, destx + firstDistance), starty - firstDistance]) // 3
-              points.push([Math.max(startx + minfx, destx + firstDistance), desty]) // 4
-              points.push([destx + firstDistance, desty]) // 5
+              {
+                const minfx = w / 2 + firstDistance
+                points.push([startx, starty - firstDistance]) // 2
+                points.push([Math.max(startx + minfx, destx + firstDistance), starty - firstDistance]) // 3
+                points.push([Math.max(startx + minfx, destx + firstDistance), desty]) // 4
+                points.push([destx + firstDistance, desty]) // 5
+              }
               break
             // no default
           }

@@ -20,7 +20,6 @@ body {
 
 .workflow-main {
   position: relative;
-  height: calc(100vh - 65px);
   box-sizing: border-box;
 
   * {
@@ -79,6 +78,21 @@ body {
     height: 100%;
     z-index: 1;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+
+    .el-form--default.el-form--label-top .el-form-item {
+      margin-bottom: 10px;
+
+      .el-form-item__label {
+        margin-bottom: 0;
+        line-height: 32px;
+      }
+    }
+
+    .is-required>label::before {
+      content: '*';
+      color: red;
+      margin-right: 3px;
+    }
   }
 
   .component-item {

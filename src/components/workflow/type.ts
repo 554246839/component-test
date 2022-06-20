@@ -24,7 +24,8 @@ namespace WF {
     type: LineType
     points: [number, number][]
     centerPoint: [number, number]
-    extra: string
+    displayName: string
+    props?: Record<string, any>
   }
 
   export interface Next {
@@ -33,8 +34,9 @@ namespace WF {
     directionStart: Direction
     directionEnd: Direction
     lineType: LineType
-    extra: string
+    displayName: string
     componentId?: string
+    props?: Record<string, any>
   }
 
   export interface PropItem {
@@ -96,7 +98,8 @@ namespace WF {
     ctx: CanvasRenderingContext2D
     type: LineType
     id?: string
-    extra?: string
+    displayName?: string
+    props?: Record<string, any>
   }
 
   export interface EditingLineInfo {

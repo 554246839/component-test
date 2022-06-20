@@ -62,20 +62,28 @@ export const isAboveLine = (offsetX: number, offsetY: number, points: WF.LineInf
       }
     } else {
       // 先用 x 求出对应的 t，用 t 求相应位置的 y，再比较得出的 y 与 offsetY 之间的差值
-      const tsx = getBezierT(innerPonints[0][0], innerPonints[1][0], innerPonints[2][0], innerPonints[3][0], offsetX)
+      const tsx = getBezierT(
+        innerPonints[0][0], innerPonints[1][0], innerPonints[2][0], innerPonints[3][0], offsetX
+      )
       for (let x = 0; x < 3; x++) {
         if (tsx[x] <= 1 && tsx[x] >= 0) {
-          const ny = getThreeBezierPoint(tsx[x], innerPonints[0], innerPonints[1], innerPonints[2], innerPonints[3])
+          const ny = getThreeBezierPoint(
+            tsx[x], innerPonints[0], innerPonints[1], innerPonints[2], innerPonints[3]
+          )
           if (Math.abs(ny[1] - offsetY) < 8) {
             return points[i]
           }
         }
       }
       // 如果上述没有结果，则用 y 求出对应的 t，再用 t 求出对应的 x，与 offsetX 进行匹配
-      const tsy = getBezierT(innerPonints[0][1], innerPonints[1][1], innerPonints[2][1], innerPonints[3][1], offsetY)
+      const tsy = getBezierT(
+        innerPonints[0][1], innerPonints[1][1], innerPonints[2][1], innerPonints[3][1], offsetY
+      )
       for (let y = 0; y < 3; y++) {
         if (tsy[y] <= 1 && tsy[y] >= 0) {
-          const nx = getThreeBezierPoint(tsy[y], innerPonints[0], innerPonints[1], innerPonints[2], innerPonints[3])
+          const nx = getThreeBezierPoint(
+            tsy[y], innerPonints[0], innerPonints[1], innerPonints[2], innerPonints[3]
+          )
           if (Math.abs(nx[0] - offsetX) < 8) {
             return points[i]
           }
@@ -232,8 +240,8 @@ export const updateComponentLineText = (
     if (next.length) {
       for (let j = 0; j < next.length; j++) {
         if (next[j].id === id) {
-          if (next[j].extra !== val) {
-            next[j].extra = val
+          if (next[j].displayName !== val) {
+            next[j].displayName = val
             updateLineText(allLinePoints, id, val)
             return true
           }
@@ -248,7 +256,7 @@ export const updateComponentLineText = (
 const updateLineText = (allLinePoints: WF.LineInfo[], id: string, val: string) => {
   for (let i = 0; i < allLinePoints.length; i++) {
     if (allLinePoints[i].id === id) {
-      allLinePoints[i].extra = val
+      allLinePoints[i].displayName = val
     }
   }
 }
@@ -365,7 +373,9 @@ function getDistance(pt: [number, number], p: [number, number], q: [number, numb
  * @param {number} X 曲线中的某个点 x/y
  * @returns {number[]} t[]
  */
-export const getBezierT = (x1: number, x2: number, x3: number, x4: number, X: number) => {
+export const getBezierT = (
+  x1: number, x2: number, x3: number, x4: number, X: number
+) => {
   const a = -x1 + 3 * x2 - 3 * x3 + x4
   const b = 3 * x1 - 6 * x2 + 3 * x3
   const c = -3 * x1 + 3 * x2

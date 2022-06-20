@@ -1,7 +1,7 @@
 import type { App } from 'vue'
 import Workflow from './index.vue'
 
-Workflow.install = function WorkflowInstall(app: App) {
+(Workflow as any).install = function WorkflowInstall(app: App) {
   app.component(Workflow.name, Workflow)
 }
 

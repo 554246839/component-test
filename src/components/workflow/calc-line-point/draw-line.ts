@@ -6,7 +6,7 @@
 
 import WF from '../type'
 import drawArrow from '../draw-arrow'
-import { getCenterPoint, getThreeBezierPoint } from '../utils'
+import { getCenterPoint } from '../utils'
 import calcStraightPoints from './calc-straight-points'
 import calcBezierPoints from './calc-bezier-points'
 
@@ -25,8 +25,11 @@ const shadowLine = (ctx: CanvasRenderingContext2D, highlight?: boolean) => {
   }
 }
 
-export default function drawLine({ ctx, startx, starty, startDire, destx, desty, destDire, w, h, dw, dh, type = 'broken', id, extra = '' }: WF.AllType,
-  highlight?: boolean) {
+export default function drawLine({
+  ctx, startx, starty, startDire, destx, desty, destDire,
+  w, h, dw, dh, type = 'broken', id, displayName = '', props
+}: WF.AllType,
+highlight?: boolean) {
 
   if (!destDire) {
     if (Math.abs(desty - starty) >= Math.abs(destx - startx)) {
@@ -59,7 +62,7 @@ export default function drawLine({ ctx, startx, starty, startDire, destx, desty,
   // 获取中点坐标
   const centerPoint = getCenterPoint(points, type)
 
-  return { type, points, id, centerPoint, extra }
+  return { type, points, id, centerPoint, displayName, props }
 }
 
 // 绘制缓存line
