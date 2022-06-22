@@ -12,6 +12,9 @@
     <div class="router-item">
       <router-link to="/workflow">工作流页面配置</router-link>
     </div>
+    <div class="router-item">
+      <router-link to="/previewImg">图片预览</router-link>
+    </div>
   </div>
 </template>
 
@@ -24,6 +27,7 @@ export default {
 <style lang="scss">
 .main-index {
   padding-top: 100px;
+
   .router-item {
     text-align: center;
     margin: 20px;
