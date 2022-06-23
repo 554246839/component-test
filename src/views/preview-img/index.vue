@@ -8,42 +8,52 @@
     >
       <img
         v-preview
+        loading="lazy"
         src="~@/assets/img/t0.jpg"
       >
       <img
         v-preview
+        loading="lazy"
         src="~@/assets/img/t1.jpg"
       >
       <img
         v-preview
+        loading="lazy"
         src="~@/assets/img/t2.jpg"
       >
       <img
         v-preview
+        loading="lazy"
         src="~@/assets/img/t3.jpg"
       >
       <img
         v-preview
+        loading="lazy"
         src="~@/assets/img/t4.jpg"
       >
       <img
         v-preview
+        loading="lazy"
         src="~@/assets/img/t5.jpg"
       >
       <img
         v-preview
+        loading="lazy"
         src="~@/assets/img/t6.jpg"
       >
       <img
         v-preview
+        loading="lazy"
         src="~@/assets/img/t7.jpg"
       >
       <img
         v-preview
+        loading="lazy"
         src="~@/assets/img/t8.jpg"
       >
       <img
         v-preview
+        loading="lazy"
         src="~@/assets/img/t9.jpg"
       >
     </template>

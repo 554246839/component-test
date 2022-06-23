@@ -13,17 +13,10 @@ function handleClick(el: HTMLImageElement, src: string) {
   })
 }
 
-let bindingFunction: () => void
-
 const preview: Directive<HTMLImageElement> = {
   // 在绑定元素的父组件挂载之前调用
   beforeMount(el, binding) {
-    bindingFunction = handleClick.bind(null, el, binding.value || el.src)
-    el.addEventListener('click', bindingFunction)
-  },
-  // 在绑定元素的父组件卸载之前调用
-  beforeUnmount(el) {
-    el.removeEventListener('click', bindingFunction)
+    el.addEventListener('click', handleClick.bind(null, el, binding.value || el.src))
   }
 }
 
