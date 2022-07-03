@@ -15,6 +15,9 @@
     <div class="router-item">
       <router-link to="/previewImg">图片预览</router-link>
     </div>
+    <div class="router-item">
+      <router-link to="/gobang">五子棋</router-link>
+    </div>
   </div>
 </template>
 

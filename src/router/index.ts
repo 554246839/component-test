@@ -30,6 +30,11 @@ const baseRoutes: VueRouter.RouteRecordRaw[] = [
     path: '/previewImg',
     name: 'PreviewImg',
     component: () => import('@/views/preview-img/index.vue')
+  },
+  {
+    path: '/gobang',
+    name: 'Gobang',
+    component: () => import('@/views/gobang/index.vue')
   }
 ]
 
