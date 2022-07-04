@@ -6,9 +6,12 @@
 
 export type GobangData = (0 | 1 | undefined)[][]
 
+//          右上      右      右下    下      左下      左      左上       上
+const ds = [[-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0]]
+
 /**
  * 判读当前坐标是否满足结束要求
- * @param {number[][]} data 棋盘数据
+ * @param {GobangData} data 棋盘数据
  * @param {number} x x 轴
  * @param {number} y y 轴
  * @param {number} m 最大行数
@@ -18,8 +21,6 @@ export type GobangData = (0 | 1 | undefined)[][]
 function getPostionResult(
   data: GobangData, x: number, y: number, m: number, n: number
 ) {
-  //          右上      右      右下    下
-  const ds = [[-1, 1], [0, 1], [1, 1], [1, 0]]
   const val = data[x][y]
 
   for (let i = 0; i < ds.length; i++) {
@@ -44,24 +45,26 @@ function getPostionResult(
 /**
  * 判断是否结束
  * 从当前点查询八个方向的连续5个位置是否能连城线
- * 但是在具体的逻辑判断中，是从左往右，从上往下一次判断的，
- * 所以在真正的执行过程中，只需要判断4个方向即可
- * 这里选择的四个方向是：右上、右、右下、下
- * @param {number[][]} data 棋盘数据
+ * 所有格子是否全部填满
+ * 最后下棋的坐标是否连城线
+ * @param {GobangData} data 棋盘数据
+ * @param {[number, number]} posi 最后一个是否满足结束的坐标点
  */
-export const isOver = (data: GobangData) => {
+export const isOver = (data: GobangData, posi: [number, number]) => {
   const m = data.length, n = data[0].length
   let nullCnt = m * n
+
+  // 先判断最后一个点是否满足结束
+  if (getPostionResult(
+    data, posi[0], posi[1], m, n
+  )) {
+    return posi
+  }
 
   for (let i = 0; i < m; i++) {
     for (let j = 0; j < n; j++) {
       if (data[i][j] !== undefined) {
         nullCnt--
-        if (getPostionResult(
-          data, i, j, m, n
-        )) {
-          return [i, j]
-        }
       }
     }
   }
@@ -191,7 +194,7 @@ export const drawPieces = (
  */
 export const getPostions = (
   offsetX: number, offsetY: number, gap: number, padding: number, r = 12
-) => {
+): [number, number] | false => {
   const x = Math.round((offsetX - padding) / gap)
   const y = Math.round((offsetY - padding) / gap)
   // x1, y1 为圆心坐标

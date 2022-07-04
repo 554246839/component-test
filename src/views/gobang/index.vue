@@ -90,7 +90,7 @@ const canvasClick = (e: MouseEvent) => {
     data[posi[0]][posi[1]] = current.value
     init()
     pushStack(data)
-    const res = isOver(data)
+    const res = isOver(data, posi)
     if (res) {
       gameOver.value = true
       setTimeout(() => {
