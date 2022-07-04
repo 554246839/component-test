@@ -6,8 +6,8 @@
 
 export type GobangData = (0 | 1 | undefined)[][]
 
-//          右上      右      右下    下      左下      左      左上       上
-const ds = [[-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0]]
+//           右上      左下       右      左          右下    左上        下      上
+const ds = [[[-1, 1], [1, -1]], [[0, 1], [0, -1]], [[1, 1], [-1, -1]], [[1, 0], [-1, 0]]]
 
 /**
  * 判读当前坐标是否满足结束要求
@@ -24,18 +24,28 @@ function getPostionResult(
   const val = data[x][y]
 
   for (let i = 0; i < ds.length; i++) {
-    const [dx, dy] = ds[i]
-    let nx = x, ny = y, flag = true
-    for (let i = 0; i < 4; i++) {
-      nx += dx
-      ny += dy
+    const [[lx, ly], [rx, ry]] = ds[i]
+    let nx = x, ny = y, cnt = 1
+    for (let j = 0; j < 4; j++) {
+      nx += lx
+      ny += ly
       if (!(nx >= 0 && nx < m && ny >= 0 && ny < n) || data[nx][ny] !== val) {
-        flag = false
         break
       }
+      cnt++
     }
 
-    if (flag) {
+    nx = x
+    ny = y
+    for (let j = 0; j < 4; j++) {
+      nx += rx
+      ny += ry
+      if (!(nx >= 0 && nx < m && ny >= 0 && ny < n) || data[nx][ny] !== val) {
+        break
+      }
+      cnt++
+    }
+    if (cnt >= 5) {
       return true
     }
   }
@@ -148,7 +158,7 @@ function drawBlackPieces(
 }
 
 /**
- * 绘制棋子
+ * 绘制棋子，先循环列，再循环行
  * @param ctx canvas的2d实例
  * @param data 棋盘数据
  * @param number 行列数
@@ -165,14 +175,16 @@ export const drawPieces = (
 ) => {
   const m = data.length, n = data[0].length
   for (let i = 0; i < m; i++) {
-    const ci = i * gap + padding + 6 - padding
-    const si = padding + i * gap
+    // 列坐标
+    const cj = i * gap + padding + 6 - padding
+    const sj = padding + i * gap
     for (let j = 0; j < n; j++) {
       if (data[i][j] === undefined) {
         continue
       }
-      const cj = j * gap + padding + 6 - padding
-      const sj = padding + j * gap
+      // 行坐标
+      const ci = j * gap + padding + 6 - padding
+      const si = padding + j * gap
       if (!data[i][j]) {
         drawBlackPieces(
           ctx, ci, cj, si, sj, radius
@@ -188,18 +200,18 @@ export const drawPieces = (
 
 /**
  * 根据点击的坐标来获取棋盘数据的坐标
- * @param offsetX 相对于父级元素的 x
- * @param offsetY 相对于父级元素的 Y
+ * @param offsetX 相对于父级元素的 x => 列位置
+ * @param offsetY 相对于父级元素的 Y => 行位置
  * @param gap 行列间隔距离
  */
 export const getPostions = (
   offsetX: number, offsetY: number, gap: number, padding: number, r = 12
 ): [number, number] | false => {
-  const x = Math.round((offsetX - padding) / gap)
-  const y = Math.round((offsetY - padding) / gap)
+  const x = Math.round((offsetY - padding) / gap)
+  const y = Math.round((offsetX - padding) / gap)
   // x1, y1 为圆心坐标
   const x1 = x * gap + padding, y1 = y * gap + padding
-  const nr = Math.pow(Math.pow(x1 - offsetX, 2) + Math.pow(y1 - offsetY, 2), 0.5)
+  const nr = Math.pow(Math.pow(x1 - offsetY, 2) + Math.pow(y1 - offsetX, 2), 0.5)
   if (nr <= r) {
     return [x, y]
   }
